@@ -3,9 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokémon Battle Simulator</title>
+    <title>Battle Simulator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .battle-pokemon {
+            margin-bottom: 20px;
+        }
+        .battle-pokemon img {
+            max-width: 100px;
+        }
+        .health-bar {
+            background-color: #ddd;
+            width: 100%;
+            height: 20px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .health-bar-fill {
+            background-color: #76c7c0;
+            width: 100%;
+            height: 100%;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -27,28 +48,266 @@
         </div>
     </nav>
 
-    <div class="container">
-        <h1 class="text-center mt-5">Pokémon Battle Simulator</h1>
+    <div class="container mt-5">
+        <h1 class="text-center">Pokémon Battle Simulator</h1>
         <div class="row">
-            <div class="col-md-6">
-                <h3>Select Pokémon for Team 1</h3>
-                <input type="text" id="pokemon1" class="form-control mb-2" placeholder="Enter Pokémon Name or ID">
-                <button id="addPokemon1" class="btn btn-primary mb-3">Add to Team 1</button>
-                <div id="team1" class="team-container"></div>
+            <div class="col-md-6 text-center">
+                <h3>Team 1</h3>
+                <div id="team1Current" class="battle-pokemon"></div>
+                <ul id="team1Moves" class="list-group mt-3"></ul>
             </div>
-            <div class="col-md-6">
-                <h3>Select Pokémon for Team 2</h3>
-                <input type="text" id="pokemon2" class="form-control mb-2" placeholder="Enter Pokémon Name or ID">
-                <button id="addPokemon2" class="btn btn-primary mb-3">Add to Team 2</button>
-                <div id="team2" class="team-container"></div>
+            <div class="col-md-6 text-center">
+                <h3>Team 2</h3>
+                <div id="team2Current" class="battle-pokemon"></div>
+                <ul id="team2Moves" class="list-group mt-3"></ul>
             </div>
         </div>
-        <div class="text-center mt-4">
-            <button id="startBattle" class="btn btn-danger">Start Battle</button>
-        </div>
+        <button id="startBattle" class="btn btn-danger mt-5">Start Battle</button>
         <div id="battleLog" class="mt-5"></div>
     </div>
 
-    <script src="js/battle.js"></script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Battle Simulator JS -->
+    <script>
+        let team1 = [];
+        let team2 = [];
+        let currentTurn = 1;
+        const battleLog = [];
+        let moveData = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('moves.json')
+                .then(response => response.json())
+                .then(data => {
+                    moveData = data;
+                    console.log('Move data loaded:', moveData);
+                })
+                .catch(error => {
+                    console.error('Error loading move data:', error);
+                });
+        });
+
+        document.getElementById('startBattle').addEventListener('click', () => {
+            const savedTeam = JSON.parse(localStorage.getItem('pokemonTeam'));
+            if (!savedTeam || savedTeam.length === 0) {
+                alert('No saved team found for Team 1.');
+                return;
+            }
+
+            team1 = savedTeam.map(pokemon => ({
+                ...pokemon,
+                currentHp: pokemon.pokemon.stats.find(stat => stat.stat.name === 'hp').base_stat,
+                status: 'healthy'
+            }));
+            generateRandomTeam(team2);
+        });
+
+        function generateRandomTeam(team) {
+            team.length = 0;
+            for (let i = team.length; i < 1; i++) {
+                const randomId = Math.floor(Math.random() * 898) + 1;
+                fetchPokemon(randomId, team, 'team2');
+            }
+        }
+
+        function fetchPokemon(pokemonNameOrId, team, teamId) {
+            fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNameOrId}`)
+                .then(response => response.json())
+                .then(data => {
+                    team.push({
+                        pokemon: data,
+                        moves: [],
+                        currentHp: data.stats.find(stat => stat.stat.name === 'hp').base_stat,
+                        status: 'healthy'
+                    });
+                    if (team.length === 1) {
+                        updateBattleDisplay();
+                    }
+                })
+                .catch(error => {
+                    alert('Error fetching Pokémon. Please try again.');
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+
+        function updateBattleDisplay() {
+            displayPokemon(team1[0], 'team1');
+            displayPokemon(team2[0], 'team2');
+        }
+
+        function displayPokemon(battlePokemon, teamId) {
+            const battleContainer = document.getElementById(`${teamId}Current`);
+            const moveList = document.getElementById(`${teamId}Moves`);
+
+            battleContainer.innerHTML = `
+                <img src="${battlePokemon.pokemon.sprites.front_default}" alt="${battlePokemon.pokemon.name}" class="img-fluid">
+                <h4>${battlePokemon.pokemon.name}</h4>
+                <div class="health-bar">
+                    <div class="health-bar-fill" id="health-bar-${teamId}-0" style="width: 100%;"></div>
+                </div>
+                <p>HP: ${battlePokemon.currentHp}/${battlePokemon.pokemon.stats.find(stat => stat.stat.name === 'hp').base_stat}</p>
+                <p>Status: ${battlePokemon.status}</p>
+            `;
+
+            moveList.innerHTML = '';
+            battlePokemon.pokemon.moves.slice(0, 4).forEach((move, index) => {
+                const moveName = move.move.name;
+                const moveItem = document.createElement('li');
+                moveItem.className = 'list-group-item';
+                moveItem.innerHTML = `<button class="btn btn-primary btn-block" onclick="useMove('${teamId}', 0, '${moveName}')">${moveName}</button>`;
+                moveList.appendChild(moveItem);
+            });
+        }
+
+        function useMove(teamId, pokemonIndex, moveName) {
+            const team = teamId === 'team1' ? team1 : team2;
+            const opponentTeam = teamId === 'team1' ? team2 : team1;
+            const opponentPokemon = opponentTeam[0];
+
+            const move = moveData.find(m => m.name === moveName);
+            if (!move) {
+                alert(`Move ${moveName} not found in move data.`);
+                return;
+            }
+
+            console.log('Using move:', move);
+
+            const damage = calculateDamage(move, team[pokemonIndex], opponentPokemon);
+            opponentPokemon.currentHp -= damage;
+
+            const logEntry = `${teamId === 'team1' ? 'Team 1' : 'Team 2'}'s ${team[pokemonIndex].pokemon.name} used ${move.name} on ${opponentPokemon.pokemon.name} for ${damage} damage!`;
+            battleLog.push(logEntry);
+            document.getElementById('battleLog').innerHTML += `<p>${logEntry}</p>`;
+
+            if (move.effect !== 'none') {
+                applyMoveEffect(move, opponentPokemon);
+            }
+
+            updateHealthBar(opponentPokemon, teamId === 'team1' ? 'team2' : 'team1', 0);
+
+            if (opponentPokemon.currentHp <= 0) {
+                const faintLogEntry = `${opponentPokemon.pokemon.name} fainted!`;
+                battleLog.push(faintLogEntry);
+                document.getElementById('battleLog').innerHTML += `<p>${faintLogEntry}</p>`;
+                opponentTeam.splice(opponentTeam.indexOf(opponentPokemon), 1);
+                if (opponentTeam.length === 0) {
+                    const winLogEntry = `${teamId === 'team1' ? 'Team 1' : 'Team 2'} wins!`;
+                    battleLog.push(winLogEntry);
+                    document.getElementById('battleLog').innerHTML += `<h3>${winLogEntry}</h3>`;
+                    return;
+                }
+            }
+
+            currentTurn++;
+            if (teamId === 'team1') {
+                aiTurn();
+            }
+        }
+
+        function applyMoveEffect(move, opponentPokemon) {
+            switch (move.effect) {
+                case 'burn':
+                    opponentPokemon.status = 'burned';
+                    break;
+                case 'paralyze':
+                    opponentPokemon.status = 'paralyzed';
+                    break;
+                case 'confuse':
+                    opponentPokemon.status = 'confused';
+                    break;
+                case 'poison':
+                    opponentPokemon.status = 'poisoned';
+                    break;
+                case 'sleep':
+                    opponentPokemon.status = 'asleep';
+                    break;
+                case 'leech':
+                    opponentPokemon.status = 'seeded';
+                    break;
+                case 'lower_def':
+                    opponentPokemon.pokemon.stats.find(stat => stat.stat.name === 'defense').base_stat -= 1;
+                    break;
+                case 'lower_sp_def':
+                    opponentPokemon.pokemon.stats.find(stat => stat.stat.name === 'special-defense').base_stat -= 1;
+                    break;
+                case 'high_crit':
+                    opponentPokemon.status = 'high_crit';
+                    break;
+                case 'freeze':
+                    opponentPokemon.status = 'frozen';
+                    break;
+                case 'protect':
+                    opponentPokemon.status = 'protected';
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        function calculateDamage(move, attacker, defender) {
+            const movePower = move.power || 50;
+            const attackStat = attacker.pokemon.stats.find(stat => stat.stat.name === 'attack').base_stat;
+            const defenseStat = defender.pokemon.stats.find(stat => stat.stat.name === 'defense').base_stat;
+            const baseDamage = ((2 * attacker.pokemon.level / 5 + 2) * movePower * attackStat / defenseStat / 50) + 2;
+
+            // Type effectiveness
+            const effectiveness = calculateTypeEffectiveness(move.type, defender.pokemon.types.map(type => type.type.name));
+
+            // Critical hit
+            const isCritical = Math.random() < 0.1; // 10% chance
+            const criticalMultiplier = isCritical ? 1.5 : 1;
+
+            // Accuracy check
+            const hitChance = Math.random() * 100;
+            if (hitChance > move.accuracy) {
+                return 0; // Missed attack
+            }
+
+            return baseDamage * effectiveness * criticalMultiplier;
+        }
+
+        function calculateTypeEffectiveness(moveType, defenderTypes) {
+            let effectiveness = 1;
+            defenderTypes.forEach(type => {
+                effectiveness *= typeChart[moveType].strengths.includes(type) ? 2 : (typeChart[moveType].weaknesses.includes(type) ? 0.5 : 1);
+            });
+            return effectiveness;
+        }
+
+        function updateHealthBar(pokemon, teamId, pokemonIndex) {
+            const healthBar = document.getElementById(`health-bar-${teamId}-${pokemonIndex}`);
+            const hpStat = pokemon.pokemon.stats.find(stat => stat.stat.name === 'hp').base_stat;
+            const currentHp = Math.max(pokemon.currentHp, 0); // Ensure HP doesn't go below 0
+            const healthPercentage = (currentHp / hpStat) * 100;
+            healthBar.style.width = `${healthPercentage}%`;
+        }
+
+        function aiTurn() {
+            const currentAI = team2[0]; // Simplified to always use the first Pokémon in team2
+            const move = aiChooseMove(currentAI.pokemon);
+            if (move) {
+                useMove('team2', 0, move.name); // Simplified for one Pokémon in team2
+            }
+        }
+
+        function aiChooseMove(pokemon) {
+            const availableMoves = pokemon.moves.filter(move => move.pp > 0);
+            if (availableMoves.length === 0) return null;
+
+            const randomFactor = Math.random();
+            const sortedMoves = availableMoves.sort((a, b) => {
+                if (randomFactor < difficultyLevels[selectedDifficulty]) {
+                    return b.power - a.power; // Choose the strongest move
+                } else {
+                    return Math.random() - 0.5; // Choose a random move
+                }
+            });
+
+            return sortedMoves[0];
+        }
+    </script>
 </body>
 </html>

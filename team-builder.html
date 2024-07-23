@@ -3,9 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokémon Team Builder</title>
+    <title>Team Builder</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .pokemon-image {
+            max-width: 100px;
+            max-height: 100px;
+        }
+        .move-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -27,11 +38,129 @@
         </div>
     </nav>
 
-    <div class="container">
-        <h1 class="text-center mt-5">Pokémon Team Builder</h1>
-        <div id="teamBuilder" class="mt-5"></div>
+    <div class="container mt-5">
+        <h1 class="text-center">Pokémon Team Builder</h1>
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <input type="text" id="pokemonInput" class="form-control" placeholder="Enter Pokémon name or ID">
+                <button id="addPokemonBtn" class="btn btn-primary btn-block mt-3">Add Pokémon</button>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-8 offset-md-2">
+                <h3 class="text-center">Your Team</h3>
+                <ul id="teamList" class="list-group"></ul>
+                <button id="saveTeamBtn" class="btn btn-success btn-block mt-3">Save Team</button>
+            </div>
+        </div>
     </div>
 
-    <script src="js/team-builder.js"></script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Team Builder JS -->
+    <script>
+        let team = [];
+        let moveData = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('moves.json')
+                .then(response => response.json())
+                .then(data => {
+                    moveData = data;
+                    console.log('Move data loaded:', moveData);
+                })
+                .catch(error => {
+                    console.error('Error loading move data:', error);
+                });
+        });
+
+        document.getElementById('addPokemonBtn').addEventListener('click', () => {
+            const pokemonInput = document.getElementById('pokemonInput').value.toLowerCase();
+            if (team.length >= 6) {
+                alert('You can only have up to 6 Pokémon in your team.');
+                return;
+            }
+            fetchPokemon(pokemonInput);
+        });
+
+        document.getElementById('saveTeamBtn').addEventListener('click', () => {
+            localStorage.setItem('pokemonTeam', JSON.stringify(team));
+            alert('Team saved successfully!');
+        });
+
+        function fetchPokemon(pokemonNameOrId) {
+            fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNameOrId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    addPokemonToTeam(data);
+                })
+                .catch(error => {
+                    alert('Error fetching Pokémon. Please try again.');
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+
+        function addPokemonToTeam(pokemon) {
+            team.push({
+                pokemon: pokemon,
+                moves: []
+            });
+            updateTeamList();
+        }
+
+        function updateTeamList() {
+            const teamList = document.getElementById('teamList');
+            teamList.innerHTML = '';
+
+            team.forEach((entry, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                listItem.innerHTML = `
+                    <div>
+                        <img src="${entry.pokemon.sprites.front_default}" class="pokemon-image mr-3">
+                        <span>${entry.pokemon.name}</span>
+                        <div class="move-selection" id="moveSelection-${index}">
+                            ${generateMoveSelectHtml(index)}
+                        </div>
+                    </div>
+                    <button class="btn btn-danger btn-sm" onclick="removePokemonFromTeam(${index})">Remove</button>
+                `;
+                teamList.appendChild(listItem);
+            });
+        }
+
+        function generateMoveSelectHtml(index) {
+            console.log('Generating move select HTML');
+            let moveSelectHtml = '';
+            for (let i = 0; i < 4; i++) {
+                moveSelectHtml += `
+                    <select class="form-control move-select" onchange="assignMove(${index}, ${i}, this.value)">
+                        <option value="">Select move</option>
+                        ${moveData.map(move => `<option value="${move.name}">${move.name}</option>`).join('')}
+                    </select>
+                `;
+            }
+            return moveSelectHtml;
+        }
+
+        function assignMove(pokemonIndex, moveIndex, moveName) {
+            const move = moveData.find(m => m.name === moveName);
+            if (move) {
+                team[pokemonIndex].moves[moveIndex] = move;
+            }
+        }
+
+        function removePokemonFromTeam(index) {
+            team.splice(index, 1);
+            updateTeamList();
+        }
+    </script>
 </body>
 </html>

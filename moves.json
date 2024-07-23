@@ -1,0 +1,298 @@
+[
+    {
+        "name": "tackle",
+        "power": 40,
+        "accuracy": 100,
+        "type": "normal",
+        "pp": 35,
+        "effect": "none"
+    },
+    {
+        "name": "vine whip",
+        "power": 45,
+        "accuracy": 100,
+        "type": "grass",
+        "pp": 25,
+        "effect": "none"
+    },
+    {
+        "name": "ember",
+        "power": 40,
+        "accuracy": 100,
+        "type": "fire",
+        "pp": 25,
+        "effect": "burn"
+    },
+    {
+        "name": "water gun",
+        "power": 40,
+        "accuracy": 100,
+        "type": "water",
+        "pp": 25,
+        "effect": "none"
+    },
+    {
+        "name": "thunder shock",
+        "power": 40,
+        "accuracy": 100,
+        "type": "electric",
+        "pp": 30,
+        "effect": "paralyze"
+    },
+    {
+        "name": "gust",
+        "power": 40,
+        "accuracy": 100,
+        "type": "flying",
+        "pp": 35,
+        "effect": "none"
+    },
+    {
+        "name": "scratch",
+        "power": 40,
+        "accuracy": 100,
+        "type": "normal",
+        "pp": 35,
+        "effect": "none"
+    },
+    {
+        "name": "quick attack",
+        "power": 40,
+        "accuracy": 100,
+        "type": "normal",
+        "pp": 30,
+        "effect": "none"
+    },
+    {
+        "name": "confusion",
+        "power": 50,
+        "accuracy": 100,
+        "type": "psychic",
+        "pp": 25,
+        "effect": "confuse"
+    },
+    {
+        "name": "poison sting",
+        "power": 15,
+        "accuracy": 100,
+        "type": "poison",
+        "pp": 35,
+        "effect": "poison"
+    },
+    {
+        "name": "rock throw",
+        "power": 50,
+        "accuracy": 90,
+        "type": "rock",
+        "pp": 15,
+        "effect": "none"
+    },
+    {
+        "name": "shadow ball",
+        "power": 80,
+        "accuracy": 100,
+        "type": "ghost",
+        "pp": 15,
+        "effect": "lower_sp_def"
+    },
+    {
+        "name": "dragon breath",
+        "power": 60,
+        "accuracy": 100,
+        "type": "dragon",
+        "pp": 20,
+        "effect": "paralyze"
+    },
+    {
+        "name": "earthquake",
+        "power": 100,
+        "accuracy": 100,
+        "type": "ground",
+        "pp": 10,
+        "effect": "none"
+    },
+    {
+        "name": "ice beam",
+        "power": 90,
+        "accuracy": 100,
+        "type": "ice",
+        "pp": 10,
+        "effect": "freeze"
+    },
+    {
+        "name": "iron tail",
+        "power": 100,
+        "accuracy": 75,
+        "type": "steel",
+        "pp": 15,
+        "effect": "lower_def"
+    },
+    {
+        "name": "bug bite",
+        "power": 60,
+        "accuracy": 100,
+        "type": "bug",
+        "pp": 20,
+        "effect": "none"
+    },
+    {
+        "name": "body slam",
+        "power": 85,
+        "accuracy": 100,
+        "type": "normal",
+        "pp": 15,
+        "effect": "paralyze"
+    },
+    {
+        "name": "flamethrower",
+        "power": 90,
+        "accuracy": 100,
+        "type": "fire",
+        "pp": 15,
+        "effect": "burn"
+    },
+    {
+        "name": "hydro pump",
+        "power": 110,
+        "accuracy": 80,
+        "type": "water",
+        "pp": 5,
+        "effect": "none"
+    },
+    {
+        "name": "thunderbolt",
+        "power": 90,
+        "accuracy": 100,
+        "type": "electric",
+        "pp": 15,
+        "effect": "paralyze"
+    },
+    {
+        "name": "wing attack",
+        "power": 60,
+        "accuracy": 100,
+        "type": "flying",
+        "pp": 35,
+        "effect": "none"
+    },
+    {
+        "name": "psychic",
+        "power": 90,
+        "accuracy": 100,
+        "type": "psychic",
+        "pp": 10,
+        "effect": "lower_sp_def"
+    },
+    {
+        "name": "sludge bomb",
+        "power": 90,
+        "accuracy": 100,
+        "type": "poison",
+        "pp": 10,
+        "effect": "poison"
+    },
+    {
+        "name": "stone edge",
+        "power": 100,
+        "accuracy": 80,
+        "type": "rock",
+        "pp": 5,
+        "effect": "high_crit"
+    },
+    {
+        "name": "shadow claw",
+        "power": 70,
+        "accuracy": 100,
+        "type": "ghost",
+        "pp": 15,
+        "effect": "high_crit"
+    },
+    {
+        "name": "dragon claw",
+        "power": 80,
+        "accuracy": 100,
+        "type": "dragon",
+        "pp": 15,
+        "effect": "none"
+    },
+    {
+        "name": "dig",
+        "power": 80,
+        "accuracy": 100,
+        "type": "ground",
+        "pp": 10,
+        "effect": "none"
+    },
+    {
+        "name": "blizzard",
+        "power": 110,
+        "accuracy": 70,
+        "type": "ice",
+        "pp": 5,
+        "effect": "freeze"
+    },
+    {
+        "name": "steel wing",
+        "power": 70,
+        "accuracy": 90,
+        "type": "steel",
+        "pp": 25,
+        "effect": "none"
+    },
+    {
+        "name": "x-scissor",
+        "power": 80,
+        "accuracy": 100,
+        "type": "bug",
+        "pp": 15,
+        "effect": "none"
+    },
+    {
+        "name": "toxic",
+        "power": 0,
+        "accuracy": 90,
+        "type": "poison",
+        "pp": 10,
+        "effect": "poison"
+    },
+    {
+        "name": "thunder wave",
+        "power": 0,
+        "accuracy": 90,
+        "type": "electric",
+        "pp": 20,
+        "effect": "paralyze"
+    },
+    {
+        "name": "hypnosis",
+        "power": 0,
+        "accuracy": 60,
+        "type": "psychic",
+        "pp": 20,
+        "effect": "sleep"
+    },
+    {
+        "name": "leech seed",
+        "power": 0,
+        "accuracy": 90,
+        "type": "grass",
+        "pp": 10,
+        "effect": "leech"
+    },
+    {
+        "name": "will-o-wisp",
+        "power": 0,
+        "accuracy": 85,
+        "type": "fire",
+        "pp": 15,
+        "effect": "burn"
+    },
+    {
+        "name": "protect",
+        "power": 0,
+        "accuracy": 0,
+        "type": "normal",
+        "pp": 10,
+        "effect": "protect"
+    }
+]

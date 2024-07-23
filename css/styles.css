@@ -13,29 +13,10 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.hero {
-    background-image: url('lugia.jpg'); /* Ensure this path is correct */
-    background-size: cover;
-    background-position: center;
-    color: #fff;
-    padding: 100px 0;
-    text-align: center;
-    position: relative;
-}
-
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
 .hero-content {
     position: relative;
     z-index: 1;
+    padding: 20px;
 }
 
 .hero h1 {
@@ -99,6 +80,12 @@ ul {
 .card img {
     max-width: 100px;
     margin-bottom: 10px;
+}
+
+.carousel-caption {
+    background-color: rgba(0, 0, 0, 0.5); /* Add a semi-transparent background */
+    padding: 10px;
+    border-radius: 10px;
 }
 
 .btn-primary {
@@ -169,4 +156,26 @@ ul {
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.featured-pokemon img {
+    max-width: 100%;
+    height: auto;
+}
+
+.carousel-inner img {
+    max-height: 400px;
+    object-fit: cover;
+}
+
+.pokemon-fact {
+    background-color: #e9ecef;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.pokemon-tips .list-group-item {
+    background-color: #e9ecef;
+    border: none;
 }
