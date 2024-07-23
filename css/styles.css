@@ -1,7 +1,7 @@
 body {
-    background-color: #f0f8ff;
+    background-color: #e9ecef;
     font-family: 'Helvetica Neue', sans-serif;
-    color: #333;
+    color: #343a40;
 }
 
 .navbar-brand {
@@ -34,7 +34,7 @@ ul {
     padding: 0;
 }
 
-.type-card, .ability-card, .move-card, .generation-card, .pokemon-card {
+.card {
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 20px;
@@ -50,4 +50,20 @@ ul {
 
 .btn-primary:hover {
     background-color: #0056b3;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.grid-item {
+    text-align: center;
+}
+
+#suggestions {
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
 }

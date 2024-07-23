@@ -8,10 +8,21 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <!-- Navbar Include -->
+    <div id="navbar"></div>
+
     <div class="container">
         <h1 class="text-center mt-5">Pokémon Types</h1>
-        <div id="pokemonTypes" class="mt-5"></div>
+        <div id="pokemonTypes" class="grid-container mt-5"></div>
     </div>
+
     <script src="js/types.js"></script>
+    <script>
+        fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar').innerHTML = data;
+            });
+    </script>
 </body>
 </html>

@@ -3,7 +3,7 @@ fetch('https://pokeapi.co/api/v2/type')
     .then(data => {
         const pokemonTypes = document.getElementById('pokemonTypes');
         pokemonTypes.innerHTML = data.results.map(type => `
-            <div class="type-card">
+            <div class="grid-item card">
                 <h2>${type.name}</h2>
                 <a href="type-details.html?type=${type.name}" class="btn btn-primary">Explore ${type.name} Pokémon</a>
             </div>
