@@ -1,10 +1,16 @@
 body {
-    background-color: #f8f9fa;
-    font-family: Arial, sans-serif;
+    background-color: #f0f8ff;
+    font-family: 'Helvetica Neue', sans-serif;
+    color: #333;
+}
+
+.navbar-brand {
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
 h1, h2, h3 {
-    color: #333;
+    color: #007bff;
 }
 
 img {
@@ -26,4 +32,22 @@ img {
 ul {
     list-style-type: none;
     padding: 0;
+}
+
+.type-card, .ability-card, .move-card, .generation-card, .pokemon-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px 0;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
 }
