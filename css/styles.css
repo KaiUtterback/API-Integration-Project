@@ -1,5 +1,5 @@
 body {
-    background-color: #e9ecef;
+    background-color: #f8f9fa;
     font-family: 'Helvetica Neue', sans-serif;
     color: #343a40;
 }
@@ -9,20 +9,73 @@ body {
     font-weight: bold;
 }
 
-h1, h2, h3 {
-    color: #007bff;
+.navbar {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-img {
-    max-width: 150px;
-    display: block;
-    margin: 0 auto;
+.hero {
+    background-image: url('lugia.jpg'); /* Ensure this path is correct */
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    padding: 100px 0;
+    text-align: center;
+    position: relative;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero h1 {
+    font-size: 3em;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+
+.hero .btn-primary {
+    font-size: 1.2em;
+    padding: 10px 30px;
+    background-color: #ffcb05;
+    color: #2a75bb;
+    border: none;
+}
+
+.hero .btn-primary:hover {
+    background-color: #f9b233;
+    color: #fff;
 }
 
 .container {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
+}
+
+h1, h2, h3 {
+    color: #2a75bb;
+}
+
+img {
+    max-width: 150px;
+    display: block;
+    margin: 0 auto;
 }
 
 #pokemonResult, #pokemonDetails {
@@ -43,13 +96,19 @@ ul {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.card img {
+    max-width: 100px;
+    margin-bottom: 10px;
+}
+
 .btn-primary {
-    background-color: #007bff;
+    background-color: #2a75bb;
     border: none;
+    color: #fff;
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+    background-color: #004080;
 }
 
 .grid-container {
@@ -66,4 +125,48 @@ ul {
     z-index: 1000;
     max-height: 200px;
     overflow-y: auto;
+}
+
+#pokemonDetails .detail-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px 0;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#pokemonDetails .detail-card h3 {
+    color: #ffcb05;
+}
+
+#pokemonDetails .detail-card ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#pokemonDetails .detail-card ul li {
+    margin: 5px 0;
+    background-color: #f1f1f1;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.team-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.team-container .card {
+    width: 120px;
+    text-align: center;
+}
+
+#battleLog {
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }

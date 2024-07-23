@@ -7,14 +7,22 @@ fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
     .then(data => {
         const pokemonDetails = document.getElementById('pokemonDetails');
         pokemonDetails.innerHTML = `
-            <h2>${data.name} (#${data.id})</h2>
-            <img src="${data.sprites.front_default}" alt="${data.name}">
-            <h3>Abilities</h3>
-            <ul>${data.abilities.map(ability => `<li>${ability.ability.name}</li>`).join('')}</ul>
-            <h3>Types</h3>
-            <ul>${data.types.map(type => `<li>${type.type.name}</li>`).join('')}</ul>
-            <h3>Stats</h3>
-            <ul>${data.stats.map(stat => `<li>${stat.stat.name}: ${stat.base_stat}</li>`).join('')}</ul>
+            <div class="detail-card">
+                <h2>${data.name} (#${data.id})</h2>
+                <img src="${data.sprites.front_default}" alt="${data.name}">
+            </div>
+            <div class="detail-card">
+                <h3>Abilities</h3>
+                <ul>${data.abilities.map(ability => `<li>${ability.ability.name}</li>`).join('')}</ul>
+            </div>
+            <div class="detail-card">
+                <h3>Types</h3>
+                <ul>${data.types.map(type => `<li>${type.type.name}</li>`).join('')}</ul>
+            </div>
+            <div class="detail-card">
+                <h3>Stats</h3>
+                <ul>${data.stats.map(stat => `<li>${stat.stat.name}: ${stat.base_stat}</li>`).join('')}</ul>
+            </div>
         `;
     })
     .catch(error => {

@@ -8,21 +8,47 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Navbar Include -->
-    <div id="navbar"></div>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="index.html">PokeAPI</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="search.html">Search</a></li>
+                <li class="nav-item"><a class="nav-link" href="types.html">Types</a></li>
+                <li class="nav-item"><a class="nav-link" href="abilities.html">Abilities</a></li>
+                <li class="nav-item"><a class="nav-link" href="moves.html">Moves</a></li>
+                <li class="nav-item"><a class="nav-link" href="generations.html">Generations</a></li>
+                <li class="nav-item"><a class="nav-link" href="team-builder.html">Team Builder</a></li>
+                <li class="nav-item"><a class="nav-link" href="battle-simulator.html">Battle Simulator</a></li>
+            </ul>
+        </div>
+    </nav>
 
     <div class="container">
         <h1 class="text-center mt-5">Pokémon Battle Simulator</h1>
-        <div id="battleSimulator" class="mt-5"></div>
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Select Pokémon for Team 1</h3>
+                <input type="text" id="pokemon1" class="form-control mb-2" placeholder="Enter Pokémon Name or ID">
+                <button id="addPokemon1" class="btn btn-primary mb-3">Add to Team 1</button>
+                <div id="team1" class="team-container"></div>
+            </div>
+            <div class="col-md-6">
+                <h3>Select Pokémon for Team 2</h3>
+                <input type="text" id="pokemon2" class="form-control mb-2" placeholder="Enter Pokémon Name or ID">
+                <button id="addPokemon2" class="btn btn-primary mb-3">Add to Team 2</button>
+                <div id="team2" class="team-container"></div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <button id="startBattle" class="btn btn-danger">Start Battle</button>
+        </div>
+        <div id="battleLog" class="mt-5"></div>
     </div>
 
     <script src="js/battle.js"></script>
-    <script>
-        fetch('navbar.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('navbar').innerHTML = data;
-            });
-    </script>
 </body>
 </html>
