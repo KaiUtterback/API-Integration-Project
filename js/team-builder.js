@@ -44,3 +44,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     document.body.appendChild(addButton);
 });
+class Trainer {
+    constructor(name, appearance) {
+        this.name = name;
+        this.appearance = appearance;
+        this.teams = [];
+    }
+
+    createTeam(pokemonArray) {
+        this.teams.push(pokemonArray);
+    }
+
+    customizeAppearance(newAppearance) {
+        this.appearance = newAppearance;
+    }
+}
+
+let currentTrainer = new Trainer('Ash', 'default');
