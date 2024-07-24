@@ -3,9 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokémon Generations</title>
+    <title>Generations</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: url('subtle-pattern.png');
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .dark-mode-toggle {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .generation-card, .pokemon-card {
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            background-color: white;
+            cursor: pointer;
+            text-align: center;
+        }
+        .dark-mode .generation-card, .dark-mode .pokemon-card {
+            background-color: #333;
+            border: 1px solid #555;
+        }
+        .generation-card:hover, .pokemon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -23,15 +61,98 @@
                 <li class="nav-item"><a class="nav-link" href="generations.html">Generations</a></li>
                 <li class="nav-item"><a class="nav-link" href="team-builder.html">Team Builder</a></li>
                 <li class="nav-item"><a class="nav-link" href="battle-simulator.html">Battle Simulator</a></li>
+                <li class="nav-item">
+                    <button class="dark-mode-toggle nav-link" onclick="toggleDarkMode()">🌙</button>
+                </li>
             </ul>
         </div>
     </nav>
 
-    <div class="container">
-        <h1 class="text-center mt-5">Pokémon Generations</h1>
-        <div id="pokemonGenerations" class="grid-container mt-5"></div>
+    <!-- Page Content -->
+    <div class="container mt-5">
+        <h2>Pokémon Generations</h2>
+        <div class="row" id="generation-list">
+            <!-- Generation cards will be added here -->
+        </div>
+        <div class="row mt-4" id="pokemon-list">
+            <!-- Pokémon list will be added here -->
+        </div>
     </div>
 
-    <script src="js/generations.js"></script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="js/dark-mode.js"></script>
+    <script>
+        const generations = [
+            { id: 1, name: 'Generation 1', description: 'The original Pokémon from the Kanto region.', endpoint: 'https://pokeapi.co/api/v2/generation/1/' },
+            { id: 2, name: 'Generation 2', description: 'The second wave of Pokémon from the Johto region.', endpoint: 'https://pokeapi.co/api/v2/generation/2/' },
+            { id: 3, name: 'Generation 3', description: 'The third wave of Pokémon from the Hoenn region.', endpoint: 'https://pokeapi.co/api/v2/generation/3/' },
+            { id: 4, name: 'Generation 4', description: 'The fourth wave of Pokémon from the Sinnoh region.', endpoint: 'https://pokeapi.co/api/v2/generation/4/' },
+            { id: 5, name: 'Generation 5', description: 'The fifth wave of Pokémon from the Unova region.', endpoint: 'https://pokeapi.co/api/v2/generation/5/' },
+            { id: 6, name: 'Generation 6', description: 'The sixth wave of Pokémon from the Kalos region.', endpoint: 'https://pokeapi.co/api/v2/generation/6/' },
+            { id: 7, name: 'Generation 7', description: 'The seventh wave of Pokémon from the Alola region.', endpoint: 'https://pokeapi.co/api/v2/generation/7/' },
+            { id: 8, name: 'Generation 8', description: 'The eighth wave of Pokémon from the Galar region.', endpoint: 'https://pokeapi.co/api/v2/generation/8/' }
+        ];
+
+        function renderGenerations() {
+            const generationList = document.getElementById('generation-list');
+            generations.forEach(gen => {
+                const genCard = document.createElement('div');
+                genCard.classList.add('col-md-3', 'generation-card');
+                genCard.innerHTML = `
+                    <h3>${gen.name}</h3>
+                    <p>${gen.description}</p>
+                `;
+                genCard.addEventListener('click', () => loadGeneration(gen.endpoint));
+                generationList.appendChild(genCard);
+            });
+        }
+
+        async function loadGeneration(endpoint) {
+            const pokemonList = document.getElementById('pokemon-list');
+            pokemonList.innerHTML = '<div class="col-12"><h3>Loading...</h3></div>';
+            try {
+                const response = await fetch(endpoint);
+                if (!response.ok) throw new Error('Failed to fetch generation data');
+                const data = await response.json();
+                const pokemonEntries = data.pokemon_species.sort((a, b) => {
+                    const idA = parseInt(a.url.split('/').slice(-2, -1)[0]);
+                    const idB = parseInt(b.url.split('/').slice(-2, -1)[0]);
+                    return idA - idB;
+                });
+                const pokemonData = await Promise.all(pokemonEntries.map(async entry => {
+                    const pokemonResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${entry.name}`);
+                    return pokemonResponse.ok ? await pokemonResponse.json() : null;
+                }));
+                renderPokemonList(pokemonData.filter(pokemon => pokemon !== null));
+            } catch (error) {
+                console.error('Error loading generation:', error);
+                pokemonList.innerHTML = '<div class="col-12"><h3>Error loading data</h3></div>';
+            }
+        }
+
+        function renderPokemonList(pokemonEntries) {
+            const pokemonList = document.getElementById('pokemon-list');
+            pokemonList.innerHTML = '';
+            pokemonEntries.forEach(entry => {
+                const pokemonCard = document.createElement('div');
+                pokemonCard.classList.add('col-md-2', 'pokemon-card');
+                pokemonCard.innerHTML = `
+                    <a href="pokemon-details.html?name=${entry.name}">
+                        <img src="${entry.sprites.front_default}" alt="${entry.name}">
+                        <h5>${entry.name}</h5>
+                        <p>Pokédex #${entry.id}</p>
+                    </a>
+                `;
+                pokemonList.appendChild(pokemonCard);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderGenerations();
+        });
+    </script>
 </body>
 </html>
