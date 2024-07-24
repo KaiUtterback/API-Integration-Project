@@ -1,49 +1,43 @@
-let allPokemonNames = [];
+document.addEventListener('DOMContentLoaded', () => {
+    loadSuggestions();
+});
 
-// Fetch all Pokémon names for auto-complete
-fetch('https://pokeapi.co/api/v2/pokemon?limit=1000')
-    .then(response => response.json())
-    .then(data => {
-        allPokemonNames = data.results.map(pokemon => pokemon.name);
-    })
-    .catch(error => {
-        console.error('Error fetching Pokémon names:', error);
-    });
+function loadSuggestions() {
+    const searchInput = document.getElementById('search-input');
+    const suggestionsContainer = document.getElementById('suggestions');
 
-document.getElementById('pokemonName').addEventListener('input', function() {
-    const input = this.value.toLowerCase();
-    const suggestions = document.getElementById('suggestions');
-    suggestions.innerHTML = '';
-    if (input.length > 0) {
-        const filteredNames = allPokemonNames.filter(name => name.startsWith(input));
-        filteredNames.forEach(name => {
-            const suggestionItem = document.createElement('li');
-            suggestionItem.textContent = name;
-            suggestionItem.className = 'list-group-item list-group-item-action';
-            suggestionItem.addEventListener('click', function() {
-                document.getElementById('pokemonName').value = name;
-                suggestions.innerHTML = '';
+    searchInput.addEventListener('input', async () => {
+        const query = searchInput.value.toLowerCase();
+        if (query.length === 0) {
+            suggestionsContainer.innerHTML = '';
+            return;
+        }
+
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1000');
+        const data = await response.json();
+        const pokemonNames = data.results.map(pokemon => pokemon.name);
+
+        const filteredSuggestions = pokemonNames.filter(name => name.startsWith(query));
+        suggestionsContainer.innerHTML = '';
+
+        if (filteredSuggestions.length > 0) {
+            filteredSuggestions.forEach(suggestion => {
+                const suggestionItem = document.createElement('div');
+                suggestionItem.classList.add('suggestion-item');
+                suggestionItem.textContent = suggestion;
+                suggestionItem.onclick = () => {
+                    searchInput.value = suggestion;
+                    suggestionsContainer.innerHTML = '';
+                };
+                suggestionsContainer.appendChild(suggestionItem);
             });
-            suggestions.appendChild(suggestionItem);
-        });
-    }
-});
+        }
+    });
+}
 
-document.getElementById('searchButton').addEventListener('click', function() {
-    const pokemonName = document.getElementById('pokemonName').value.toLowerCase();
-    fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
-        .then(response => response.json())
-        .then(data => {
-            const pokemonResult = document.getElementById('pokemonResult');
-            pokemonResult.innerHTML = `
-                <h2>${data.name} (#${data.id})</h2>
-                <img src="${data.sprites.front_default}" alt="${data.name}">
-                <p>Height: ${data.height}</p>
-                <p>Weight: ${data.weight}</p>
-                <p>Types: ${data.types.map(type => type.type.name).join(', ')}</p>
-            `;
-        })
-        .catch(error => {
-            document.getElementById('pokemonResult').innerHTML = '<p>Pokémon not found. Please try again.</p>';
-        });
-});
+function searchPokemon() {
+    const query = document.getElementById('search-input').value.toLowerCase();
+    if (query.length > 0) {
+        window.location.href = `pokemon-details.html?name=${query}`;
+    }
+}

@@ -56,3 +56,22 @@ function getPokemonIdFromUrl(url) {
     const urlParts = url.split('/');
     return urlParts[urlParts.length - 2];
 }
+document.addEventListener('DOMContentLoaded', () => {
+    async function loadTypePokemon(type) {
+        try {
+            const response = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
+            const data = await response.json();
+            // Process and display the Pokémon data
+            console.log(data.pokemon);
+        } catch (error) {
+            console.error('Error fetching type data:', error);
+        }
+    }
+
+    document.querySelectorAll('.type-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const type = button.getAttribute('data-type');
+            loadTypePokemon(type);
+        });
+    });
+});

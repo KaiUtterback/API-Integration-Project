@@ -1,181 +1,63 @@
+/* Add the dark mode and card styles */
 body {
-    background-color: #f8f9fa;
-    font-family: 'Helvetica Neue', sans-serif;
-    color: #343a40;
+    font-family: 'Raleway', sans-serif;
+    background: url('subtle-pattern.png');
+    transition: background-color 0.3s, color 0.3s;
 }
-
-.navbar-brand {
-    font-size: 1.5em;
-    font-weight: bold;
+.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
 }
-
-.navbar {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.dark-mode-toggle {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
 }
-
-.hero-content {
+.hero-section {
+    background: url('images/lugia.jpg') no-repeat center center/cover;
+    height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: relative;
+    text-align: center;
+}
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+}
+.hero-section h1 {
     position: relative;
     z-index: 1;
-    padding: 20px;
+    font-size: 3rem;
 }
-
-.hero h1 {
-    font-size: 3em;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-.hero p {
-    font-size: 1.2em;
-    margin-bottom: 30px;
-}
-
-.hero .btn-primary {
-    font-size: 1.2em;
-    padding: 10px 30px;
-    background-color: #ffcb05;
-    color: #2a75bb;
-    border: none;
-}
-
-.hero .btn-primary:hover {
-    background-color: #f9b233;
-    color: #fff;
-}
-
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-h1, h2, h3 {
-    color: #2a75bb;
-}
-
-img {
-    max-width: 150px;
-    display: block;
-    margin: 0 auto;
-}
-
-#pokemonResult, #pokemonDetails {
-    text-align: center;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.card {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    margin: 10px 0;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.card img {
-    max-width: 100px;
-    margin-bottom: 10px;
-}
-
-.carousel-caption {
-    background-color: rgba(0, 0, 0, 0.5); /* Add a semi-transparent background */
-    padding: 10px;
-    border-radius: 10px;
-}
-
-.btn-primary {
-    background-color: #2a75bb;
-    border: none;
-    color: #fff;
-}
-
-.btn-primary:hover {
-    background-color: #004080;
-}
-
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-}
-
-.grid-item {
-    text-align: center;
-}
-
-#suggestions {
-    z-index: 1000;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-#pokemonDetails .detail-card {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    margin: 10px 0;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-#pokemonDetails .detail-card h3 {
-    color: #ffcb05;
-}
-
-#pokemonDetails .detail-card ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-#pokemonDetails .detail-card ul li {
-    margin: 5px 0;
-    background-color: #f1f1f1;
-    padding: 5px;
-    border-radius: 5px;
-}
-
-.team-container {
+.card-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
+    gap: 20px;
 }
-
-.team-container .card {
-    width: 120px;
-    text-align: center;
-}
-
-#battleLog {
-    background-color: #f1f1f1;
+.card {
+    background: white;
     border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    text-align: center;
+    padding: 15px;
 }
-
-.featured-pokemon img {
-    max-width: 100%;
-    height: auto;
-}
-
-.carousel-inner img {
-    max-height: 400px;
+.card img {
+    width: 100px;
+    height: 100px;
     object-fit: cover;
 }
-
-.pokemon-fact {
-    background-color: #e9ecef;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-}
-
-.pokemon-tips .list-group-item {
-    background-color: #e9ecef;
-    border: none;
+.card:hover {
+    transform: translateY(-5px);
 }
