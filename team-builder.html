@@ -5,16 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Builder</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap">
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        .pokemon-image {
-            max-width: 100px;
-            max-height: 100px;
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: url('subtle-pattern.png');
+            transition: background-color 0.3s, color 0.3s;
         }
-        .move-selection {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .dark-mode-toggle {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .pokemon-card {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            background-color: white;
+        }
+        .dark-mode .pokemon-card {
+            background-color: #333;
+            border: 1px solid #555;
+        }
+        .pokemon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -34,23 +61,29 @@
                 <li class="nav-item"><a class="nav-link" href="generations.html">Generations</a></li>
                 <li class="nav-item"><a class="nav-link" href="team-builder.html">Team Builder</a></li>
                 <li class="nav-item"><a class="nav-link" href="battle-simulator.html">Battle Simulator</a></li>
+                <li class="nav-item">
+                    <button class="dark-mode-toggle nav-link" onclick="toggleDarkMode()">🌙</button>
+                </li>
             </ul>
         </div>
     </nav>
 
+    <!-- Page Content -->
     <div class="container mt-5">
-        <h1 class="text-center">Pokémon Team Builder</h1>
+        <h2>Pokémon Team Builder</h2>
         <div class="row">
-            <div class="col-md-6 offset-md-3">
-                <input type="text" id="pokemonInput" class="form-control" placeholder="Enter Pokémon name or ID">
-                <button id="addPokemonBtn" class="btn btn-primary btn-block mt-3">Add Pokémon</button>
+            <div class="col-12">
+                <input type="text" id="pokemonName" class="form-control" placeholder="Enter Pokémon Name">
+                <button class="btn btn-primary mt-2" id="addPokemon">Add Pokémon</button>
             </div>
         </div>
-        <div class="row mt-5">
-            <div class="col-md-8 offset-md-2">
-                <h3 class="text-center">Your Team</h3>
-                <ul id="teamList" class="list-group"></ul>
-                <button id="saveTeamBtn" class="btn btn-success btn-block mt-3">Save Team</button>
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3>Your Team</h3>
+                <div id="team" class="d-flex flex-wrap">
+                    <!-- Team Pokémon will be added here -->
+                </div>
+                <button class="btn btn-success mt-4" id="saveTeam">Save Team</button>
             </div>
         </div>
     </div>
@@ -59,535 +92,66 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- Team Builder JS -->
+    <script src="js/dark-mode.js"></script>
     <script>
-        let team = [];
-        let moveData = [
-            {
-                "name": "tackle",
-                "power": 40,
-                "accuracy": 100,
-                "type": "normal",
-                "pp": 35,
-                "effect": "none"
-            },
-            {
-                "name": "vine whip",
-                "power": 45,
-                "accuracy": 100,
-                "type": "grass",
-                "pp": 25,
-                "effect": "none"
-            },
-            {
-                "name": "ember",
-                "power": 40,
-                "accuracy": 100,
-                "type": "fire",
-                "pp": 25,
-                "effect": "burn"
-            },
-            {
-                "name": "water gun",
-                "power": 40,
-                "accuracy": 100,
-                "type": "water",
-                "pp": 25,
-                "effect": "none"
-            },
-            {
-                "name": "thunder shock",
-                "power": 40,
-                "accuracy": 100,
-                "type": "electric",
-                "pp": 30,
-                "effect": "paralyze"
-            },
-            {
-                "name": "gust",
-                "power": 40,
-                "accuracy": 100,
-                "type": "flying",
-                "pp": 35,
-                "effect": "none"
-            },
-            {
-                "name": "quick attack",
-                "power": 40,
-                "accuracy": 100,
-                "type": "normal",
-                "pp": 30,
-                "effect": "none"
-            },
-            {
-                "name": "confusion",
-                "power": 50,
-                "accuracy": 100,
-                "type": "psychic",
-                "pp": 25,
-                "effect": "confuse"
-            },
-            {
-                "name": "poison sting",
-                "power": 15,
-                "accuracy": 100,
-                "type": "poison",
-                "pp": 35,
-                "effect": "poison"
-            },
-            {
-                "name": "rock throw",
-                "power": 50,
-                "accuracy": 90,
-                "type": "rock",
-                "pp": 15,
-                "effect": "none"
-            },
-            {
-                "name": "shadow ball",
-                "power": 80,
-                "accuracy": 100,
-                "type": "ghost",
-                "pp": 15,
-                "effect": "lower_sp_def"
-            },
-            {
-                "name": "dragon breath",
-                "power": 60,
-                "accuracy": 100,
-                "type": "dragon",
-                "pp": 20,
-                "effect": "paralyze"
-            },
-            {
-                "name": "earthquake",
-                "power": 100,
-                "accuracy": 100,
-                "type": "ground",
-                "pp": 10,
-                "effect": "none"
-            },
-            {
-                "name": "ice beam",
-                "power": 90,
-                "accuracy": 100,
-                "type": "ice",
-                "pp": 10,
-                "effect": "freeze"
-            },
-            {
-                "name": "iron tail",
-                "power": 100,
-                "accuracy": 75,
-                "type": "steel",
-                "pp": 15,
-                "effect": "lower_def"
-            },
-            {
-                "name": "body slam",
-                "power": 85,
-                "accuracy": 100,
-                "type": "normal",
-                "pp": 15,
-                "effect": "paralyze"
-            },
-            {
-                "name": "flamethrower",
-                "power": 90,
-                "accuracy": 100,
-                "type": "fire",
-                "pp": 15,
-                "effect": "burn"
-            },
-            {
-                "name": "hydro pump",
-                "power": 110,
-                "accuracy": 80,
-                "type": "water",
-                "pp": 5,
-                "effect": "none"
-            },
-            {
-                "name": "thunderbolt",
-                "power": 90,
-                "accuracy": 100,
-                "type": "electric",
-                "pp": 15,
-                "effect": "paralyze"
-            },
-            {
-                "name": "wing attack",
-                "power": 60,
-                "accuracy": 100,
-                "type": "flying",
-                "pp": 35,
-                "effect": "none"
-            },
-            {
-                "name": "psychic",
-                "power": 90,
-                "accuracy": 100,
-                "type": "psychic",
-                "pp": 10,
-                "effect": "lower_sp_def"
-            },
-            {
-                "name": "sludge bomb",
-                "power": 90,
-                "accuracy": 100,
-                "type": "poison",
-                "pp": 10,
-                "effect": "poison"
-            },
-            {
-                "name": "stone edge",
-                "power": 100,
-                "accuracy": 80,
-                "type": "rock",
-                "pp": 5,
-                "effect": "high_crit"
-            },
-            {
-                "name": "shadow claw",
-                "power": 70,
-                "accuracy": 100,
-                "type": "ghost",
-                "pp": 15,
-                "effect": "high_crit"
-            },
-            {
-                "name": "dragon claw",
-                "power": 80,
-                "accuracy": 100,
-                "type": "dragon",
-                "pp": 15,
-                "effect": "none"
-            },
-            {
-                "name": "dig",
-                "power": 80,
-                "accuracy": 100,
-                "type": "ground",
-                "pp": 10,
-                "effect": "none"
-            },
-            {
-                "name": "blizzard",
-                "power": 110,
-                "accuracy": 70,
-                "type": "ice",
-                "pp": 5,
-                "effect": "freeze"
-            },
-            {
-                "name": "steel wing",
-                "power": 70,
-                "accuracy": 90,
-                "type": "steel",
-                "pp": 25,
-                "effect": "none"
-            },
-            {
-                "name": "x-scissor",
-                "power": 80,
-                "accuracy": 100,
-                "type": "bug",
-                "pp": 15,
-                "effect": "none"
-            },
-            {
-                "name": "toxic",
-                "power": 0,
-                "accuracy": 90,
-                "type": "poison",
-                "pp": 10,
-                "effect": "poison"
-            },
-            {
-                "name": "thunder wave",
-                "power": 0,
-                "accuracy": 90,
-                "type": "electric",
-                "pp": 20,
-                "effect": "paralyze"
-            },
-            {
-                "name": "hypnosis",
-                "power": 0,
-                "accuracy": 60,
-                "type": "psychic",
-                "pp": 20,
-                "effect": "sleep"
-            },
-            {
-                "name": "leech seed",
-                "power": 0,
-                "accuracy": 90,
-                "type": "grass",
-                "pp": 10,
-                "effect": "leech"
-            },
-            {
-                "name": "will-o-wisp",
-                "power": 0,
-                "accuracy": 85,
-                "type": "fire",
-                "pp": 15,
-                "effect": "burn"
-            },
-            {
-                "name": "protect",
-                "power": 0,
-                "accuracy": 0,
-                "type": "normal",
-                "pp": 10,
-                "effect": "protect"
-            },
-            {
-                "name": "surf",
-                "power": 90,
-                "accuracy": 100,
-                "type": "water",
-                "pp": 15,
-                "effect": "none"
-            },
-            {
-                "name": "solar beam",
-                "power": 120,
-                "accuracy": 100,
-                "type": "grass",
-                "pp": 10,
-                "effect": "charge"
-            },
-            {
-                "name": "hyper beam",
-                "power": 150,
-                "accuracy": 90,
-                "type": "normal",
-                "pp": 5,
-                "effect": "recharge"
-            },
-            {
-                "name": "giga drain",
-                "power": 75,
-                "accuracy": 100,
-                "type": "grass",
-                "pp": 10,
-                "effect": "drain"
-            },
-            {
-                "name": "drain punch",
-                "power": 75,
-                "accuracy": 100,
-                "type": "fighting",
-                "pp": 10,
-                "effect": "drain"
-            },
-            {
-                "name": "shadow sneak",
-                "power": 40,
-                "accuracy": 100,
-                "type": "ghost",
-                "pp": 30,
-                "effect": "none"
-            },
-            {
-                "name": "brick break",
-                "power": 75,
-                "accuracy": 100,
-                "type": "fighting",
-                "pp": 15,
-                "effect": "none"
-            },
-            {
-                "name": "air slash",
-                "power": 75,
-                "accuracy": 95,
-                "type": "flying",
-                "pp": 20,
-                "effect": "flinch"
-            },
-            {
-                "name": "dark pulse",
-                "power": 80,
-                "accuracy": 100,
-                "type": "dark",
-                "pp": 15,
-                "effect": "flinch"
-            },
-            {
-                "name": "thunder punch",
-                "power": 75,
-                "accuracy": 100,
-                "type": "electric",
-                "pp": 15,
-                "effect": "paralyze"
-            },
-            {
-                "name": "fire punch",
-                "power": 75,
-                "accuracy": 100,
-                "type": "fire",
-                "pp": 15,
-                "effect": "burn"
-            },
-            {
-                "name": "ice punch",
-                "power": 75,
-                "accuracy": 100,
-                "type": "ice",
-                "pp": 15,
-                "effect": "freeze"
-            },
-            {
-                "name": "poison jab",
-                "power": 80,
-                "accuracy": 100,
-                "type": "poison",
-                "pp": 20,
-                "effect": "poison"
-            },
-            {
-                "name": "zen headbutt",
-                "power": 80,
-                "accuracy": 90,
-                "type": "psychic",
-                "pp": 15,
-                "effect": "flinch"
-            },
-            {
-                "name": "dragon pulse",
-                "power": 85,
-                "accuracy": 100,
-                "type": "dragon",
-                "pp": 10,
-                "effect": "none"
-            },
-            {
-                "name": "focus blast",
-                "power": 120,
-                "accuracy": 70,
-                "type": "fighting",
-                "pp": 5,
-                "effect": "lower_sp_def"
-            },
-            {
-                "name": "earth power",
-                "power": 90,
-                "accuracy": 100,
-                "type": "ground",
-                "pp": 10,
-                "effect": "lower_sp_def"
-            },
-            {
-                "name": "energy ball",
-                "power": 90,
-                "accuracy": 100,
-                "type": "grass",
-                "pp": 10,
-                "effect": "lower_sp_def"
-            },
-            {
-                "name": "scald",
-                "power": 80,
-                "accuracy": 100,
-                "type": "water",
-                "pp": 15,
-                "effect": "burn"
+        const team = [];
+
+        async function fetchPokemonData(pokemonName) {
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName.toLowerCase()}`);
+            if (response.ok) {
+                return response.json();
+            } else {
+                alert('Pokémon not found!');
+                throw new Error('Pokémon not found');
             }
-        ];
-
-        document.getElementById('addPokemonBtn').addEventListener('click', () => {
-            const pokemonInput = document.getElementById('pokemonInput').value.toLowerCase();
-            if (team.length >= 6) {
-                alert('You can only have up to 6 Pokémon in your team.');
-                return;
-            }
-            fetchPokemon(pokemonInput);
-        });
-
-        document.getElementById('saveTeamBtn').addEventListener('click', () => {
-            localStorage.setItem('pokemonTeam', JSON.stringify(team));
-            alert('Team saved successfully!');
-            console.log('Saved team:', JSON.stringify(team)); // Debug statement
-        });
-
-        function fetchPokemon(pokemonNameOrId) {
-            fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNameOrId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Network response was not ok: ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    addPokemonToTeam(data);
-                })
-                .catch(error => {
-                    alert('Error fetching Pokémon. Please try again.');
-                    console.error('There was a problem with the fetch operation:', error);
-                });
         }
 
-        function addPokemonToTeam(pokemon) {
-            team.push({
-                pokemon: pokemon,
-                moves: []
-            });
-            updateTeamList();
-        }
-
-        function updateTeamList() {
-            const teamList = document.getElementById('teamList');
-            teamList.innerHTML = '';
-
-            team.forEach((entry, index) => {
-                const listItem = document.createElement('li');
-                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-                listItem.innerHTML = `
-                    <div>
-                        <img src="${entry.pokemon.sprites.front_default}" class="pokemon-image mr-3">
-                        <span>${entry.pokemon.name}</span>
-                        <div class="move-selection" id="moveSelection-${index}">
-                            ${generateMoveSelectHtml(index)}
-                        </div>
-                    </div>
-                    <button class="btn btn-danger btn-sm" onclick="removePokemonFromTeam(${index})">Remove</button>
-                `;
-                teamList.appendChild(listItem);
-            });
-        }
-
-        function generateMoveSelectHtml(index) {
-            let moveSelectHtml = '';
-            for (let i = 0; i < 4; i++) {
-                moveSelectHtml += `
-                    <select class="form-control move-select" onchange="assignMove(${index}, ${i}, this.value)">
-                        <option value="">Select move</option>
-                        ${moveData.map(move => `<option value="${move.name}">${move.name}</option>`).join('')}
+        function renderTeam() {
+            const teamContainer = document.getElementById('team');
+            teamContainer.innerHTML = '';
+            team.forEach((pokemon, index) => {
+                const pokemonCard = document.createElement('div');
+                pokemonCard.classList.add('pokemon-card');
+                pokemonCard.innerHTML = `
+                    <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
+                    <p>${pokemon.name}</p>
+                    <button class="btn btn-danger" onclick="removePokemon(${index})">Remove</button>
+                    <select class="form-control mt-2">
+                        ${pokemon.moves.slice(0, 4).map(move => `<option value="${move.move.name}">${move.move.name}</option>`).join('')}
                     </select>
                 `;
-            }
-            return moveSelectHtml;
+                teamContainer.appendChild(pokemonCard);
+            });
         }
 
-        function assignMove(pokemonIndex, moveIndex, moveName) {
-            const move = moveData.find(m => m.name === moveName);
-            if (!move) {
-                console.error(`Move not found: ${moveName}`);
-                return;
-            }
-            if (!team[pokemonIndex].pokemon.moves) {
-                team[pokemonIndex].pokemon.moves = [];
-            }
-            team[pokemonIndex].pokemon.moves[moveIndex] = move;
-            console.log(`Assigned move ${moveName} to Pokémon ${team[pokemonIndex].pokemon.name} at index ${pokemonIndex}, move index ${moveIndex}`);
-        }
-
-        function removePokemonFromTeam(index) {
+        function removePokemon(index) {
             team.splice(index, 1);
-            updateTeamList();
+            renderTeam();
         }
+
+        document.getElementById('addPokemon').addEventListener('click', async () => {
+            const pokemonName = document.getElementById('pokemonName').value;
+            try {
+                const pokemonData = await fetchPokemonData(pokemonName);
+                team.push(pokemonData);
+                renderTeam();
+            } catch (error) {
+                console.error(error);
+            }
+        });
+
+        document.getElementById('saveTeam').addEventListener('click', () => {
+            localStorage.setItem('pokemonTeam', JSON.stringify(team));
+            alert('Team saved!');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTeam = JSON.parse(localStorage.getItem('pokemonTeam'));
+            if (savedTeam) {
+                savedTeam.forEach(pokemon => team.push(pokemon));
+                renderTeam();
+            }
+        });
     </script>
 </body>
 </html>

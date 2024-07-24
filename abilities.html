@@ -3,9 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokémon Abilities</title>
+    <title>Abilities</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: url('subtle-pattern.png');
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .dark-mode-toggle {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .ability-card {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            background-color: white;
+        }
+        .dark-mode .ability-card {
+            background-color: #333;
+            border: 1px solid #555;
+        }
+        .ability-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -23,15 +60,47 @@
                 <li class="nav-item"><a class="nav-link" href="generations.html">Generations</a></li>
                 <li class="nav-item"><a class="nav-link" href="team-builder.html">Team Builder</a></li>
                 <li class="nav-item"><a class="nav-link" href="battle-simulator.html">Battle Simulator</a></li>
+                <li class="nav-item">
+                    <button class="dark-mode-toggle nav-link" onclick="toggleDarkMode()">🌙</button>
+                </li>
             </ul>
         </div>
     </nav>
 
-    <div class="container">
-        <h1 class="text-center mt-5">Pokémon Abilities</h1>
-        <div id="pokemonAbilities" class="grid-container mt-5"></div>
+    <!-- Page Content -->
+    <div class="container mt-5">
+        <h2>Pokémon Abilities</h2>
+        <div id="abilities-container" class="d-flex flex-wrap">
+            <!-- Abilities will be populated here -->
+        </div>
     </div>
 
-    <script src="js/abilities.js"></script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="js/dark-mode.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Sample abilities data
+            const abilities = [
+                { name: "Overgrow", description: "Powers up Grass-type moves when the Pokémon's HP is low." },
+                { name: "Blaze", description: "Powers up Fire-type moves when the Pokémon's HP is low." },
+                { name: "Torrent", description: "Powers up Water-type moves when the Pokémon's HP is low." },
+                { name: "Shield Dust", description: "Blocks the additional effects of attacks taken." }
+            ];
+
+            const abilitiesContainer = document.getElementById('abilities-container');
+            abilities.forEach(ability => {
+                const abilityCard = document.createElement('div');
+                abilityCard.classList.add('ability-card', 'col-md-5');
+                abilityCard.innerHTML = `
+                    <h4>${ability.name}</h4>
+                    <p>${ability.description}</p>
+                `;
+                abilitiesContainer.appendChild(abilityCard);
+            });
+        });
+    </script>
 </body>
 </html>

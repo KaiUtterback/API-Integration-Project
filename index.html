@@ -5,7 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PokeAPI Integration</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: url('subtle-pattern.png');
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .hero {
+            background: url('lugia.jpg') no-repeat center center/cover;
+            height: 60vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            position: relative;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode .hero {
+            background: url('lugia.jpg') no-repeat center center/cover;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            z-index: 2;
+        }
+        .section-title {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .featured-pokemon, .popular-types {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .pokemon-card, .type-card {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            background-color: white;
+        }
+        .dark-mode .pokemon-card, .dark-mode .type-card {
+            background-color: #333;
+            border: 1px solid #555;
+        }
+        .pokemon-card img, .type-card img {
+            width: 100px;
+            height: 100px;
+            transition: transform 0.3s;
+        }
+        .pokemon-card:hover, .type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+        }
+        .pokemon-card:hover img, .type-card:hover img {
+            transform: scale(1.1);
+        }
+        .type-card {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .dark-mode .type-card {
+            background-color: rgba(50, 50, 50, 0.8);
+        }
+        .description {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .dark-mode .description {
+            color: #bbb;
+        }
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+        .dark-mode-toggle {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -23,113 +126,54 @@
                 <li class="nav-item"><a class="nav-link" href="generations.html">Generations</a></li>
                 <li class="nav-item"><a class="nav-link" href="team-builder.html">Team Builder</a></li>
                 <li class="nav-item"><a class="nav-link" href="battle-simulator.html">Battle Simulator</a></li>
+                <li class="nav-item">
+                    <button class="dark-mode-toggle nav-link" onclick="toggleDarkMode()">🌙</button>
+                </li>
             </ul>
         </div>
     </nav>
 
-    <div class="hero" style="background-image: url('lugia.jpg'); background-size: cover; background-position: center; color: #fff; padding: 100px 0; text-align: center; position: relative;">
-        <div class="hero-content">
-            <h1>Welcome to the Pokémon World</h1>
-            <p>Explore Pokémon, their abilities, moves, and more!</p>
-            <a href="search.html" class="btn btn-primary">Search Pokémon</a>
-        </div>
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Welcome to the Pokémon World</h1>
     </div>
 
     <div class="container mt-5">
-        <h1 class="text-center">Explore Pokémon</h1>
-        <p class="text-center">Discover the amazing world of Pokémon. Search for your favorite Pokémon, learn about their abilities, moves, and more.</p>
-
         <!-- Featured Pokémon Section -->
-        <div class="featured-pokemon mt-5">
-            <h2>Featured Pokémon</h2>
-            <div id="featuredCarousel" class="carousel slide" data-ride="carousel">
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" class="d-block w-100" alt="Pikachu">
-                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50">
-                            <h5>Pikachu</h5>
-                            <p>The Electric-type Pokémon.</p>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" class="d-block w-100" alt="Bulbasaur">
-                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50">
-                            <h5>Bulbasaur</h5>
-                            <p>The Grass/Poison-type Pokémon.</p>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png" class="d-block w-100" alt="Charmander">
-                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50">
-                            <h5>Charmander</h5>
-                            <p>The Fire-type Pokémon.</p>
-                        </div>
-                    </div>
-                </div>
-                <a class="carousel-control-prev" href="#featuredCarousel" role="button" data-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Previous</span>
-                </a>
-                <a class="carousel-control-next" href="#featuredCarousel" role="button" data-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Next</span>
-                </a>
+        <h2 class="section-title">Featured Pokémon</h2>
+        <div class="featured-pokemon">
+            <div class="pokemon-card" onclick="window.location.href='pokedex.html#charizard'">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png" alt="Charizard">
+                <p>Charizard</p>
+                <p class="description">A Fire/Flying type Pokémon known for its powerful flames and ability to fly.</p>
+            </div>
+            <div class="pokemon-card" onclick="window.location.href='pokedex.html#pikachu'">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="Pikachu">
+                <p>Pikachu</p>
+                <p class="description">An Electric type Pokémon famous for its electric attacks and being the mascot of Pokémon.</p>
+            </div>
+            <div class="pokemon-card" onclick="window.location.href='pokedex.html#bulbasaur'">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" alt="Bulbasaur">
+                <p>Bulbasaur</p>
+                <p class="description">A Grass/Poison type Pokémon that evolves into the powerful Venusaur.</p>
             </div>
         </div>
 
-        <!-- Remove Pokémon News Section -->
-        <!-- Popular Pokémon Types Section -->
-        <div class="pokemon-types mt-5">
-            <h2>Popular Pokémon Types</h2>
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="card">
-                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" class="card-img-top" alt="Electric">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Electric</h5>
-                            <a href="types.html#electric" class="btn btn-primary">Explore</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card">
-                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" class="card-img-top" alt="Grass">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Grass</h5>
-                            <a href="types.html#grass" class="btn btn-primary">Explore</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card">
-                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png" class="card-img-top" alt="Fire">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Fire</h5>
-                            <a href="types.html#fire" class="btn btn-primary">Explore</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card">
-                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" class="card-img-top" alt="Water">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Water</h5>
-                            <a href="types.html#water" class="btn btn-primary">Explore</a>
-                        </div>
-                    </div>
-                </div>
+        <!-- Popular Types Section -->
+        <h2 class="section-title">Popular Types</h2>
+        <div class="popular-types">
+            <div class="type-card" onclick="window.location.href='types.html#fire'">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/charizard.png" alt="Fire">
+                <p>Fire</p>
             </div>
-        </div>
-
-        <!-- Pokémon Trainer Tips Section -->
-        <div class="pokemon-tips mt-5">
-            <h2>Pokémon Trainer Tips</h2>
-            <ul class="list-group">
-                <li class="list-group-item">Always carry plenty of Poké Balls.</li>
-                <li class="list-group-item">Keep a balanced team of different types.</li>
-                <li class="list-group-item">Learn the strengths and weaknesses of each type.</li>
-                <li class="list-group-item">Train your Pokémon regularly to level up.</li>
-            </ul>
+            <div class="type-card" onclick="window.location.href='types.html#water'">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/squirtle.png" alt="Water">
+                <p>Water</p>
+            </div>
+            <div class="type-card" onclick="window.location.href='types.html#grass'">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/bulbasaur.png" alt="Grass">
+                <p>Grass</p>
+            </div>
         </div>
     </div>
 
@@ -137,5 +181,17 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            if (localStorage.getItem('dark-mode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+        });
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('dark-mode', document.body.classList.contains('dark-mode'));
+        }
+    </script>
 </body>
 </html>

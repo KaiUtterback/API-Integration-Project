@@ -3,9 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokémon Search</title>
+    <title>Search</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: url('subtle-pattern.png');
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .dark-mode-toggle {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -23,9 +42,27 @@
                 <li class="nav-item"><a class="nav-link" href="generations.html">Generations</a></li>
                 <li class="nav-item"><a class="nav-link" href="team-builder.html">Team Builder</a></li>
                 <li class="nav-item"><a class="nav-link" href="battle-simulator.html">Battle Simulator</a></li>
+                <li class="nav-item">
+                    <button class="dark-mode-toggle nav-link" onclick="toggleDarkMode()">🌙</button>
+                </li>
             </ul>
         </div>
     </nav>
+
+    <!-- Page Content -->
+    <div class="container mt-5">
+        <h2>Search Pokémon</h2>
+        <!-- Search functionality content -->
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="js/dark-mode.js"></script>
+</body>
+</html>
+
 
     <div class="container">
         <h1 class="text-center mt-5">Search for Pokémon</h1>

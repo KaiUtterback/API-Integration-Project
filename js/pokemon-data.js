@@ -115,6 +115,110 @@ const pokemonData = {
             speed: 30
         },
         moves: ["body slam", "hyper beam", "earthquake", "rest"]
+    },
+    machamp: {
+        name: "machamp",
+        types: ["fighting"],
+        baseStats: {
+            hp: 90,
+            attack: 130,
+            defense: 80,
+            specialAttack: 65,
+            specialDefense: 85,
+            speed: 55
+        },
+        moves: ["karate chop", "cross chop", "dynamic punch", "submission"]
+    },
+    alakazam: {
+        name: "alakazam",
+        types: ["psychic"],
+        baseStats: {
+            hp: 55,
+            attack: 50,
+            defense: 45,
+            specialAttack: 135,
+            specialDefense: 95,
+            speed: 120
+        },
+        moves: ["psybeam", "psychic", "shadow ball", "focus blast"]
+    },
+    arcanine: {
+        name: "arcanine",
+        types: ["fire"],
+        baseStats: {
+            hp: 90,
+            attack: 110,
+            defense: 80,
+            specialAttack: 100,
+            specialDefense: 80,
+            speed: 95
+        },
+        moves: ["flamethrower", "bite", "extreme speed", "fire blast"]
+    },
+    gyarados: {
+        name: "gyarados",
+        types: ["water", "flying"],
+        baseStats: {
+            hp: 95,
+            attack: 125,
+            defense: 79,
+            specialAttack: 60,
+            specialDefense: 100,
+            speed: 81
+        },
+        moves: ["waterfall", "bite", "ice fang", "hydro pump"]
+    },
+    dragonite: {
+        name: "dragonite",
+        types: ["dragon", "flying"],
+        baseStats: {
+            hp: 91,
+            attack: 134,
+            defense: 95,
+            specialAttack: 100,
+            specialDefense: 100,
+            speed: 80
+        },
+        moves: ["dragon claw", "fly", "hyper beam", "outrage"]
+    },
+    blastoise: {
+        name: "blastoise",
+        types: ["water"],
+        baseStats: {
+            hp: 79,
+            attack: 83,
+            defense: 100,
+            specialAttack: 85,
+            specialDefense: 105,
+            speed: 78
+        },
+        moves: ["hydro pump", "bite", "ice beam", "surf"]
+    },
+    venusaur: {
+        name: "venusaur",
+        types: ["grass", "poison"],
+        baseStats: {
+            hp: 80,
+            attack: 82,
+            defense: 83,
+            specialAttack: 100,
+            specialDefense: 100,
+            speed: 80
+        },
+        moves: ["vine whip", "razor leaf", "earthquake", "solar beam"]
+    },
+    jolteon: {
+        name: "jolteon",
+        types: ["electric"],
+        baseStats: {
+            hp: 65,
+            attack: 65,
+            defense: 60,
+            specialAttack: 110,
+            specialDefense: 95,
+            speed: 130
+        },
+        moves: ["thunderbolt", "quick attack", "pin missile", "thunder wave"]
     }
 };
 
@@ -350,5 +454,133 @@ const moveData = [
         type: "psychic",
         pp: 10,
         effect: "heal"
+    },
+    {
+        name: "karate chop",
+        power: 50,
+        accuracy: 100,
+        type: "fighting",
+        pp: 25,
+        effect: "high_crit"
+    },
+    {
+        name: "cross chop",
+        power: 100,
+        accuracy: 80,
+        type: "fighting",
+        pp: 5,
+        effect: "high_crit"
+    },
+    {
+        name: "dynamic punch",
+        power: 100,
+        accuracy: 50,
+        type: "fighting",
+        pp: 5,
+        effect: "confuse"
+    },
+    {
+        name: "submission",
+        power: 80,
+        accuracy: 80,
+        type: "fighting",
+        pp: 20,
+        effect: "recoil"
+    },
+    {
+        name: "psybeam",
+        power: 65,
+        accuracy: 100,
+        type: "psychic",
+        pp: 20,
+        effect: "confuse"
+    },
+    {
+        name: "focus blast",
+        power: 120,
+        accuracy: 70,
+        type: "fighting",
+        pp: 5,
+        effect: "lower_sp_def"
+    },
+    {
+        name: "extreme speed",
+        power: 80,
+        accuracy: 100,
+        type: "normal",
+        pp: 5,
+        effect: "priority"
+    },
+    {
+        name: "fire blast",
+        power: 110,
+        accuracy: 85,
+        type: "fire",
+        pp: 5,
+        effect: "burn"
+    },
+    {
+        name: "waterfall",
+        power: 80,
+        accuracy: 100,
+        type: "water",
+        pp: 15,
+        effect: "flinch"
+    },
+    {
+        name: "ice fang",
+        power: 65,
+        accuracy: 95,
+        type: "ice",
+        pp: 15,
+        effect: "freeze_flinch"
+    },
+    {
+        name: "dragon claw",
+        power: 80,
+        accuracy: 100,
+        type: "dragon",
+        pp: 15,
+        effect: null
+    },
+    {
+        name: "fly",
+        power: 90,
+        accuracy: 95,
+        type: "flying",
+        pp: 15,
+        effect: "charge"
+    },
+    {
+        name: "outrage",
+        power: 120,
+        accuracy: 100,
+        type: "dragon",
+        pp: 10,
+        effect: "confuse_self"
+    },
+    {
+        name: "surf",
+        power: 90,
+        accuracy: 100,
+        type: "water",
+        pp: 15,
+        effect: null
+    },
+    {
+        name: "pin missile",
+        power: 25,
+        accuracy: 95,
+        type: "bug",
+        pp: 20,
+        effect: "multi_hit"
+    },
+    {
+        name: "thunder wave",
+        power: 0,
+        accuracy: 90,
+        type: "electric",
+        pp: 20,
+        effect: "paralyze"
     }
 ];
