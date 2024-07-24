@@ -87,7 +87,51 @@
                 { name: "Overgrow", description: "Powers up Grass-type moves when the Pokémon's HP is low." },
                 { name: "Blaze", description: "Powers up Fire-type moves when the Pokémon's HP is low." },
                 { name: "Torrent", description: "Powers up Water-type moves when the Pokémon's HP is low." },
-                { name: "Shield Dust", description: "Blocks the additional effects of attacks taken." }
+                { name: "Shield Dust", description: "Blocks the additional effects of attacks taken." },
+                { name: 'Shed Skin', description: 'The Pokémon may heal its own status problems.' },
+                { name: 'Compound Eyes', description: 'The Pokémon’s accuracy is boosted.' },
+                { name: 'Swarm', description: 'Powers up Bug-type moves when the Pokémon’s HP is low.' },
+                { name: 'Chlorophyll', description: 'Boosts the Pokémon’s Speed stat in harsh sunlight.' },
+                { name: 'Illuminate', description: 'Raises the likelihood of meeting wild Pokémon by illuminating the surroundings.' },
+                { name: 'Trace', description: 'When it enters a battle, the Pokémon copies an opposing Pokémon’s Ability.' },
+                { name: 'Huge Power', description: 'Doubles the Pokémon’s Attack stat.' },
+                { name: 'Poison Point', description: 'Contact with the Pokémon may poison the attacker.' },
+                { name: 'Inner Focus', description: 'The Pokémon’s intense focus prevents it from flinching.' },
+                { name: 'Static', description: 'Contact with the Pokémon may cause paralysis.' },
+                { name: 'Run Away', description: 'Enables a sure getaway from wild Pokémon.' },
+                { name: 'Rock Head', description: 'Protects the Pokémon from recoil damage.' },
+                { name: 'Damp', description: 'Prevents the use of explosive moves such as Self-Destruct by dampening its surroundings.' },
+                { name: 'Limber', description: 'Its limber body protects the Pokémon from paralysis.' },
+                { name: 'Sand Veil', description: 'Boosts the Pokémon’s evasiveness in a sandstorm.' },
+                { name: 'Volt Absorb', description: 'Restores HP if hit by an Electric-type move.' },
+                { name: 'Water Absorb', description: 'Restores HP if hit by a Water-type move.' },
+                { name: 'Oblivious', description: 'The Pokémon is oblivious, and that keeps it from being infatuated or falling for taunts.' },
+                { name: 'Cloud Nine', description: 'Eliminates the effects of weather.' },
+                { name: 'Insomnia', description: 'The Pokémon is suffering from insomnia and cannot fall asleep.' },
+                { name: 'Color Change', description: 'The Pokémon’s type becomes the type of the move used on it.' },
+                { name: 'Immunity', description: 'The immune system of the Pokémon prevents it from getting poisoned.' },
+                { name: 'Thick Fat', description: 'The Pokémon is protected by a layer of thick fat, which halves the damage taken from Fire- and Ice-type moves.' },
+                { name: 'Early Bird', description: 'The Pokémon awakens quickly from sleep.' },
+                { name: 'Flame Body', description: 'Contact with the Pokémon may burn the attacker.' },
+                { name: 'Keen Eye', description: 'The Pokémon’s keen eyes prevent its accuracy from being lowered.' },
+                { name: 'Hyper Cutter', description: 'The Pokémon’s proud of its powerful pincers. They prevent other Pokémon from lowering its Attack stat.' },
+                { name: 'Pickup', description: 'The Pokémon may pick up items.' },
+                { name: 'Truant', description: 'The Pokémon can’t attack on consecutive turns.' },
+                { name: 'Hustle', description: 'Boosts the Attack stat, but lowers accuracy.' },
+                { name: 'Guts', description: 'It’s so gutsy that having a status condition boosts the Pokémon’s Attack stat.' },
+                { name: 'Marvel Scale', description: 'The Pokémon’s marvelous scales boost its Defense stat if it has a status condition.' },
+                { name: 'Cute Charm', description: 'Contact with the Pokémon may cause infatuation.' },
+                { name: 'Plus', description: 'Boosts the Sp. Atk stat if another Pokémon has Plus or Minus.' },
+                { name: 'Minus', description: 'Boosts the Sp. Atk stat if another Pokémon has Plus or Minus.' },
+                { name: 'Forecast', description: 'The Pokémon transforms with the weather to change its type to Water, Fire, or Ice.' },
+                { name: 'Sticky Hold', description: 'Items held by the Pokémon are stuck fast and cannot be removed by other Pokémon.' },
+                { name: 'Effect Spore', description: 'Contact with the Pokémon may inflict poison, sleep, or paralysis on its attacker.' },
+                { name: 'Synchronize', description: 'The attacker will receive the same status condition if it inflicts a burn, poison, or paralysis to the Pokémon.' },
+                { name: 'Clear Body', description: 'Prevents other Pokémon from lowering the Pokémon’s stats.' },
+                { name: 'Natural Cure', description: 'All status conditions heal when the Pokémon switches out.' },
+                { name: 'Lightning Rod', description: 'The Pokémon draws in all Electric-type moves to up its Sp. Atk stat.' },
+                { name: 'Serene Grace', description: 'Boosts the likelihood of additional effects occurring.' },
+                { name: 'Swift Swim', description: 'Boosts the Pokémon’s Speed stat in rain.' }
             ];
 
             const abilitiesContainer = document.getElementById('abilities-container');
@@ -101,6 +145,10 @@
                 abilitiesContainer.appendChild(abilityCard);
             });
         });
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
     </script>
 </body>
 </html>

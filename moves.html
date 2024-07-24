@@ -5,7 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokémon Moves</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: url('subtle-pattern.png');
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .dark-mode-toggle {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .move-card {
+            margin: 10px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            background-color: white;
+            cursor: pointer;
+        }
+        .dark-mode .move-card {
+            background-color: #333;
+            border: 1px solid #555;
+        }
+        .move-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        .card-subtitle {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #777;
+        }
+        .move-details {
+            margin-top: 10px;
+        }
+        .move-details span {
+            display: block;
+        }
+        .tooltip-inner {
+            background-color: #555;
+            color: #fff;
+        }
+        .modal-content {
+            background-color: white;
+            color: black;
+        }
+        .dark-mode .modal-content {
+            background-color: #333;
+            color: #e0e0e0;
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -23,15 +87,505 @@
                 <li class="nav-item"><a class="nav-link" href="generations.html">Generations</a></li>
                 <li class="nav-item"><a class="nav-link" href="team-builder.html">Team Builder</a></li>
                 <li class="nav-item"><a class="nav-link" href="battle-simulator.html">Battle Simulator</a></li>
+                <li class="nav-item">
+                    <button class="dark-mode-toggle nav-link" onclick="toggleDarkMode()">🌙</button>
+                </li>
             </ul>
         </div>
     </nav>
 
-    <div class="container">
-        <h1 class="text-center mt-5">Pokémon Moves</h1>
-        <div id="pokemonMoves" class="grid-container mt-5"></div>
+    <!-- Page Content -->
+    <div class="container mt-5" id="moves-container">
+        <h2>Pokémon Moves</h2>
+        <div class="row" id="moves-list">
+            <!-- Move cards will be added here -->
+        </div>
     </div>
 
-    <script src="js/moves.js"></script>
+    <!-- Move Details Modal -->
+    <div class="modal fade" id="moveDetailsModal" tabindex="-1" aria-labelledby="moveDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="moveDetailsModalLabel">Move Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Move details will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="js/dark-mode.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const moves = [
+                { name: 'pound', type: 'normal', power: 40, accuracy: 100, pp: 35, description: 'A physical attack in which the user charges and slams into the target with its whole body.' },
+                { name: 'karate-chop', type: 'fighting', power: 50, accuracy: 100, pp: 25, description: 'The target is attacked with a sharp chop. Critical hits land more easily.' },
+                { name: 'comet-punch', type: 'normal', power: 18, accuracy: 85, pp: 15, description: 'The target is hit with a flurry of punches that strike two to five times in a row.' },
+                { name: 'mega-punch', type: 'normal', power: 80, accuracy: 85, pp: 20, description: 'The target is slugged by a punch thrown with muscle-packed power.' },
+                { name: 'fire-punch', type: 'fire', power: 75, accuracy: 100, pp: 15, description: 'The target is punched with a fiery fist. This may also leave the target with a burn.' },
+                { name: 'ice-punch', type: 'ice', power: 75, accuracy: 100, pp: 15, description: 'The target is punched with an icy fist. This may also leave the target frozen.' },
+                { name: 'thunder-punch', type: 'electric', power: 75, accuracy: 100, pp: 15, description: 'The target is punched with an electrified fist. This may also leave the target with paralysis.' },
+                { name: 'scratch', type: 'normal', power: 40, accuracy: 100, pp: 35, description: 'Hard, pointed, and sharp claws rake the target to inflict damage.' },
+                { name: 'vice-grip', type: 'normal', power: 55, accuracy: 100, pp: 30, description: 'The target is gripped and squeezed from both sides to inflict damage.' },
+                { name: 'guillotine', type: 'normal', power: null, accuracy: 30, pp: 5, description: 'A vicious, tearing attack with big pincers. The target faints instantly if this attack hits.' },
+                { name: 'razor-wind', type: 'normal', power: 80, accuracy: 100, pp: 10, description: 'A two-turn attack. Blades of wind hit opposing Pokémon on the second turn. Critical hits land more easily.' },
+                { name: 'swords-dance', type: 'normal', power: null, accuracy: null, pp: 20, description: 'A frenetic dance to uplift the fighting spirit. This sharply raises the user’s Attack stat.' },
+                { name: 'cut', type: 'normal', power: 50, accuracy: 95, pp: 30, description: 'The target is cut with a scythe or claw.' },
+                { name: 'gust', type: 'flying', power: 40, accuracy: 100, pp: 35, description: 'A gust of wind is whipped up by wings and launched at the target to inflict damage.' },
+                { name: 'wing-attack', type: 'flying', power: 60, accuracy: 100, pp: 35, description: 'The target is struck with large, imposing wings spread wide to inflict damage.' },
+                { name: 'whirlwind', type: 'normal', power: null, accuracy: null, pp: 20, description: 'The target is blown away, to be replaced by another Pokémon in its party. In the wild, the battle ends.' },
+                { name: 'fly', type: 'flying', power: 90, accuracy: 95, pp: 15, description: 'The user flies up into the sky and then strikes its target on the next turn.' },
+                { name: 'bind', type: 'normal', power: 15, accuracy: 85, pp: 20, description: 'Things such as long bodies or tentacles are used to bind and squeeze the target for four to five turns.' },
+                { name: 'slam', type: 'normal', power: 80, accuracy: 75, pp: 20, description: 'The target is slammed with a long tail, vines, or the like to inflict damage.' },
+                { name: 'vine-whip', type: 'grass', power: 45, accuracy: 100, pp: 25, description: 'The target is struck with slender, whiplike vines to inflict damage.' },
+                { name: 'stomp', type: 'normal', power: 65, accuracy: 100, pp: 20, description: 'The target is stomped with a big foot. This may also make the target flinch.' },
+                { name: 'double-kick', type: 'fighting', power: 30, accuracy: 100, pp: 30, description: 'The target is struck twice in a row.' },
+                { name: 'mega-kick', type: 'normal', power: 120, accuracy: 75, pp: 5, description: 'The target is attacked by a kick launched with muscle-packed power.' },
+                { name: 'jump-kick', type: 'fighting', power: 100, accuracy: 95, pp: 10, description: 'The user jumps up high, then strikes with a kick. If the kick misses, the user hurts itself.' },
+                { name: 'rolling-kick', type: 'fighting', power: 60, accuracy: 85, pp: 15, description: 'The user lashes out with a quick, spinning kick. This may also make the target flinch.' },
+                { name: 'sand-attack', type: 'ground', power: null, accuracy: 100, pp: 15, description: 'Sand is hurled in the target’s face, reducing the target’s accuracy.' },
+                { name: 'headbutt', type: 'normal', power: 70, accuracy: 100, pp: 15, description: 'The user sticks its head out and attacks by charging straight into the target. This may also make the target flinch.' },
+                { name: 'fury-attack', type: 'normal', power: 15, accuracy: 85, pp: 20, description: 'The target is jabbed repeatedly with a horn or beak two to five times in a row.' },
+                { name: 'horn-drill', type: 'normal', power: null, accuracy: 30, pp: 5, description: 'The user stabs the target with a horn that rotates like a drill. The target faints instantly if this attack hits.' },
+                { name: 'tackle', type: 'normal', power: 40, accuracy: 100, pp: 35, description: 'A physical attack in which the user charges and slams into the target with its whole body.' },
+                { name: 'body-slam', type: 'normal', power: 85, accuracy: 100, pp: 15, description: 'The user drops onto the target with its full body weight. This may also leave the target with paralysis.' },
+                { name: 'wrap', type: 'normal', power: 15, accuracy: 90, pp: 20, description: 'A long body, vines, or the like are used to wrap and squeeze the target for four to five turns.' },
+                { name: 'take-down', type: 'normal', power: 90, accuracy: 85, pp: 20, description: 'A reckless, full-body charge attack for slamming into the target. This also damages the user a little.' },
+                { name: 'thrash', type: 'normal', power: 120, accuracy: 100, pp: 10, description: 'The user rampages and attacks for two to three turns. The user then becomes confused.' },
+                { name: 'double-edge', type: 'normal', power: 120, accuracy: 100, pp: 15, description: 'A reckless, life-risking tackle in which the user rushes the target. This also damages the user quite a lot.' },
+                { name: 'tail-whip', type: 'normal', power: null, accuracy: 100, pp: 30, description: 'The user wags its tail cutely, making opposing Pokémon less wary and lowering their Defense stat.' },
+                { name: 'leer', type: 'normal', power: null, accuracy: 100, pp: 30, description: 'The user gives opposing Pokémon an intimidating leer that lowers the Defense stat.' },
+                { name: 'growl', type: 'normal', power: null, accuracy: 100, pp: 40, description: 'The user growls in an endearing way, making opposing Pokémon less wary. This lowers their Attack stat.' },
+                { name: 'roar', type: 'normal', power: null, accuracy: null, pp: 20, description: 'The target is scared off and a different Pokémon is dragged out. In the wild, this ends a battle against a single Pokémon.' },
+                { name: 'sing', type: 'normal', power: null, accuracy: 55, pp: 15, description: 'A soothing lullaby is sung in a calming voice that puts the target into a deep sleep.' },
+                { name: 'supersonic', type: 'normal', power: null, accuracy: 55, pp: 20, description: 'The user generates odd sound waves from its body that confuse the target.' },
+                { name: 'sonic-boom', type: 'normal', power: null, accuracy: 90, pp: 20, description: 'The target is hit with a destructive shock wave that always inflicts 20 HP damage.' },
+                { name: 'disable', type: 'normal', power: null, accuracy: 100, pp: 20, description: 'For four turns, this move prevents the target from using the move it last used.' },
+                { name: 'hyper-beam', type: 'normal', power: 150, accuracy: 90, pp: 5, description: 'The target is attacked with a powerful beam. The user can’t move on the next turn.' },
+                { name: 'strength', type: 'normal', power: 80, accuracy: 100, pp: 15, description: 'The target is slugged with a punch thrown at maximum power.' },
+                { name: 'absorb', type: 'grass', power: 20, accuracy: 100, pp: 25, description: 'A nutrient-draining attack. The user’s HP is restored by half the damage taken by the target.' },
+                { name: 'mega-drain', type: 'grass', power: 40, accuracy: 100, pp: 15, description: 'A nutrient-draining attack. The user’s HP is restored by half the damage taken by the target.' },
+                { name: 'leech-seed', type: 'grass', power: null, accuracy: 90, pp: 10, description: 'A seed is planted on the target. It steals some HP from the target every turn.' },
+                { name: 'growth', type: 'normal', power: null, accuracy: null, pp: 20, description: 'The user’s body grows all at once, raising the Attack and Sp. Atk stats.' },
+                { name: 'razor-leaf', type: 'grass', power: 55, accuracy: 95, pp: 25, description: 'Sharp-edged leaves are launched to slash at the opposing Pokémon. Critical hits land more easily.' },
+                { name: 'solar-beam', type: 'grass', power: 120, accuracy: 100, pp: 10, description: 'In this two-turn attack, the user gathers light, then blasts a bundled beam on the next turn.' },
+                { name: 'poison-powder', type: 'poison', power: null, accuracy: 75, pp: 35, description: 'The user scatters a cloud of poisonous dust that poisons the target.' },
+                { name: 'stun-spore', type: 'grass', power: null, accuracy: 75, pp: 30, description: 'The user scatters a cloud of numbing powder that paralyzes the target.' },
+                { name: 'sleep-powder', type: 'grass', power: null, accuracy: 75, pp: 15, description: 'The user scatters a big cloud of sleep-inducing dust around the target.' },
+                { name: 'petal-dance', type: 'grass', power: 120, accuracy: 100, pp: 10, description: 'The user attacks the target by scattering petals for two to three turns. The user then becomes confused.' },
+                { name: 'string-shot', type: 'bug', power: null, accuracy: 95, pp: 40, description: 'The opposing Pokémon are bound with silk blown from the user’s mouth that harshly lowers the Speed stat.' },
+                { name: 'dragon-rage', type: 'dragon', power: null, accuracy: 100, pp: 10, description: 'This attack hits the target with a shock wave of pure rage. This attack always inflicts 40 HP damage.' },
+                { name: 'fire-spin', type: 'fire', power: 35, accuracy: 85, pp: 15, description: 'The target becomes trapped within a fierce vortex of fire that rages for four to five turns.' },
+                { name: 'thunder-shock', type: 'electric', power: 40, accuracy: 100, pp: 30, description: 'A jolt of electricity crashes down on the target to inflict damage. This may also leave the target with paralysis.' },
+                { name: 'thunderbolt', type: 'electric', power: 90, accuracy: 100, pp: 15, description: 'A strong electric blast crashes down on the target. This may also leave the target with paralysis.' },
+                { name: 'thunder-wave', type: 'electric', power: null, accuracy: 90, pp: 20, description: 'The user launches a weak jolt of electricity that paralyzes the target.' },
+                { name: 'thunder', type: 'electric', power: 110, accuracy: 70, pp: 10, description: 'A wicked thunderbolt is dropped on the target to inflict damage. This may also leave the target with paralysis.' },
+                { name: 'rock-throw', type: 'rock', power: 50, accuracy: 90, pp: 15, description: 'The user picks up and throws a small rock at the target to attack.' },
+                { name: 'earthquake', type: 'ground', power: 100, accuracy: 100, pp: 10, description: 'The user sets off an earthquake that strikes every Pokémon around it.' },
+                { name: 'fissure', type: 'ground', power: null, accuracy: 30, pp: 5, description: 'The user opens up a fissure in the ground and drops the target in. The target instantly faints if it hits.' },
+                { name: 'dig', type: 'ground', power: 80, accuracy: 100, pp: 10, description: 'The user burrows into the ground, then attacks on the next turn.' },
+                { name: 'psychic', type: 'psychic', power: 90, accuracy: 100, pp: 10, description: 'The target is hit by a strong telekinetic force. This may also lower the target’s Sp. Def stat.' },
+                { name: 'hypnosis', type: 'psychic', power: null, accuracy: 60, pp: 20, description: 'The user employs hypnotic suggestion to make the target fall into a deep sleep.' },
+                { name: 'meditate', type: 'psychic', power: null, accuracy: null, pp: 40, description: 'The user meditates to awaken the power deep within its body and raise its Attack stat.' },
+                { name: 'agility', type: 'psychic', power: null, accuracy: null, pp: 30, description: 'The user relaxes and lightens its body to move faster. This sharply raises the Speed stat.' },
+                { name: 'quick-attack', type: 'normal', power: 40, accuracy: 100, pp: 30, description: 'The user lunges at the target at a speed that makes it almost invisible. This move always goes first.' },
+                { name: 'rage', type: 'normal', power: 20, accuracy: 100, pp: 20, description: 'As long as this move is in use, the power of rage raises the Attack stat each time the user is hit in battle.' },
+                { name: 'teleport', type: 'psychic', power: null, accuracy: null, pp: 20, description: 'Use it to flee from any wild Pokémon. It can also warp to the last Pokémon Center visited.' },
+                { name: 'night-shade', type: 'ghost', power: null, accuracy: 100, pp: 15, description: 'The user makes the target see a frightening mirage. It inflicts damage equal to the user’s level.' },
+                { name: 'mimic', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user copies the target’s last move. The move can be used during battle until the Pokémon is switched out.' },
+                { name: 'screech', type: 'normal', power: null, accuracy: 85, pp: 40, description: 'An ear-splitting screech harshly lowers the target’s Defense stat.' },
+                { name: 'double-team', type: 'normal', power: null, accuracy: null, pp: 15, description: 'By moving rapidly, the user makes illusory copies of itself to raise its evasiveness.' },
+                { name: 'recover', type: 'normal', power: null, accuracy: null, pp: 10, description: 'Restoring its own cells, the user restores its own HP by half of its max HP.' },
+                { name: 'harden', type: 'normal', power: null, accuracy: null, pp: 30, description: 'The user stiffens all the muscles in its body to raise its Defense stat.' },
+                { name: 'minimize', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user compresses its body to make itself look smaller, which sharply raises its evasiveness.' },
+                { name: 'smokescreen', type: 'normal', power: null, accuracy: 100, pp: 20, description: 'The user releases an obscuring cloud of smoke or ink. It reduces the target’s accuracy.' },
+                { name: 'confuse-ray', type: 'ghost', power: null, accuracy: 100, pp: 10, description: 'The target is exposed to a sinister ray that triggers confusion.' },
+                { name: 'withdraw', type: 'water', power: null, accuracy: null, pp: 40, description: 'The user withdraws its body into its hard shell, raising its Defense stat.' },
+                { name: 'defense-curl', type: 'normal', power: null, accuracy: null, pp: 40, description: 'The user curls up to conceal weak spots and raise its Defense stat.' },
+                { name: 'barrier', type: 'psychic', power: null, accuracy: null, pp: 30, description: 'The user throws up a sturdy wall that sharply raises its Defense stat.' },
+                { name: 'light-screen', type: 'psychic', power: null, accuracy: null, pp: 30, description: 'A wondrous wall of light is put up to reduce damage from special attacks for five turns.' },
+                { name: 'haze', type: 'ice', power: null, accuracy: null, pp: 30, description: 'The user creates a haze that eliminates every stat change among all the Pokémon engaged in battle.' },
+                { name: 'reflect', type: 'psychic', power: null, accuracy: null, pp: 20, description: 'A wondrous wall of light is put up to reduce damage from physical attacks for five turns.' },
+                { name: 'focus-energy', type: 'normal', power: null, accuracy: null, pp: 30, description: 'The user takes a deep breath and focuses so that critical hits land more easily.' },
+                { name: 'bide', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user endures attacks for two turns, then strikes back to cause double the damage taken.' },
+                { name: 'metronome', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user waggles a finger and stimulates its brain into randomly using nearly any move.' },
+                { name: 'mirror-move', type: 'flying', power: null, accuracy: null, pp: 20, description: 'The user counters the target by mimicking the target’s last move.' },
+                { name: 'self-destruct', type: 'normal', power: 200, accuracy: 100, pp: 5, description: 'The user attacks everything around it by causing an explosion. The user faints upon using this move.' },
+                { name: 'egg-bomb', type: 'normal', power: 100, accuracy: 75, pp: 10, description: 'A highly appealing move. The user hurls eggs at the target to inflict damage.' },
+                { name: 'lick', type: 'ghost', power: 30, accuracy: 100, pp: 30, description: 'The target is licked with a long tongue, causing damage. This may also leave the target with paralysis.' },
+                { name: 'smog', type: 'poison', power: 30, accuracy: 70, pp: 20, description: 'The target is attacked with a discharge of filthy gases. This may also poison the target.' },
+                { name: 'sludge', type: 'poison', power: 65, accuracy: 100, pp: 20, description: 'Unsanitary sludge is hurled at the target. This may also poison the target.' },
+                { name: 'bone-club', type: 'ground', power: 65, accuracy: 85, pp: 20, description: 'The user clubs the target with a bone. This may also make the target flinch.' },
+                { name: 'fire-blast', type: 'fire', power: 110, accuracy: 85, pp: 5, description: 'The target is attacked with an intense blast of all-consuming fire. This may also leave the target with a burn.' },
+                { name: 'waterfall', type: 'water', power: 80, accuracy: 100, pp: 15, description: 'The user charges at the target and may make it flinch. It can also be used to climb a waterfall.' },
+                { name: 'clamp', type: 'water', power: 35, accuracy: 85, pp: 10, description: 'The target is clamped and squeezed by the user’s very thick and sturdy shell for four to five turns.' },
+                { name: 'swift', type: 'normal', power: 60, accuracy: null, pp: 20, description: 'Star-shaped rays are shot at opposing Pokémon. This attack never misses.' },
+                { name: 'skull-bash', type: 'normal', power: 130, accuracy: 100, pp: 10, description: 'The user tucks in its head to raise its Defense stat on the first turn, then rams the target on the next turn.' },
+                { name: 'spike-cannon', type: 'normal', power: 20, accuracy: 100, pp: 15, description: 'Sharp spikes are shot at the target in rapid succession. They hit two to five times in a row.' },
+                { name: 'constrict', type: 'normal', power: 10, accuracy: 100, pp: 35, description: 'The target is attacked with long, creeping tentacles or vines. This may also lower the target’s Speed stat.' },
+                { name: 'amnesia', type: 'psychic', power: null, accuracy: null, pp: 20, description: 'The user temporarily empties its mind to forget its concerns. This sharply raises the user’s Sp. Def stat.' },
+                { name: 'kinesis', type: 'psychic', power: null, accuracy: 80, pp: 15, description: 'The user distracts the target by bending a spoon. This lowers the target’s accuracy.' },
+                { name: 'soft-boiled', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user restores its own HP by up to half of its max HP. It may also be used to heal an ally’s HP.' },
+                { name: 'hi-jump-kick', type: 'fighting', power: 130, accuracy: 90, pp: 10, description: 'The target is attacked with a knee kick from a jump. If it misses, the user is hurt instead.' },
+                { name: 'glare', type: 'normal', power: null, accuracy: 100, pp: 30, description: 'The user intimidates the target with the pattern on its belly to cause paralysis.' },
+                { name: 'dream-eater', type: 'psychic', power: 100, accuracy: 100, pp: 15, description: 'The user eats the dreams of a sleeping target. The user’s HP is restored by half the damage taken.' },
+                { name: 'poison-gas', type: 'poison', power: null, accuracy: 90, pp: 40, description: 'A cloud of poison gas is sprayed in the face of opposing Pokémon, poisoning those it hits.' },
+                { name: 'barrage', type: 'normal', power: 15, accuracy: 85, pp: 20, description: 'Round objects are hurled at the target to strike two to five times in a row.' },
+                { name: 'leech-life', type: 'bug', power: 80, accuracy: 100, pp: 10, description: 'The user drains the target’s blood. The user’s HP is restored by half the damage taken by the target.' },
+                { name: 'lovely-kiss', type: 'normal', power: null, accuracy: 75, pp: 10, description: 'With a scary face, the user tries to force a kiss on the target. If it succeeds, the target falls asleep.' },
+                { name: 'sky-attack', type: 'flying', power: 140, accuracy: 90, pp: 5, description: 'A second-turn attack move where critical hits land more easily. This may also make the target flinch.' },
+                { name: 'transform', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user transforms into a copy of the target right down to having the same move set.' },
+                { name: 'bubble', type: 'water', power: 40, accuracy: 100, pp: 30, description: 'A spray of countless bubbles is jetted at the opposing Pokémon. This may also lower their Speed stat.' },
+                { name: 'dizzy-punch', type: 'normal', power: 70, accuracy: 100, pp: 10, description: 'The target is hit with rhythmically launched punches. This may also leave the target confused.' },
+                { name: 'spore', type: 'grass', power: null, accuracy: 100, pp: 15, description: 'The user scatters bursts of spores that induce sleep.' },
+                { name: 'flash', type: 'normal', power: null, accuracy: 100, pp: 20, description: 'The user flashes a light that lowers the target’s accuracy. It can also be used to illuminate caves.' },
+                { name: 'psywave', type: 'psychic', power: null, accuracy: 100, pp: 15, description: 'The target is attacked with an odd psychic wave. The attack varies in intensity.' },
+                { name: 'splash', type: 'normal', power: null, accuracy: null, pp: 40, description: 'The user just flops and splashes around to no effect at all...' },
+                { name: 'acid-armor', type: 'poison', power: null, accuracy: null, pp: 20, description: 'The user alters its cellular structure to liquefy itself, sharply raising its Defense stat.' },
+                { name: 'crabhammer', type: 'water', power: 100, accuracy: 90, pp: 10, description: 'The target is hammered with a large pincer. Critical hits land more easily.' },
+                { name: 'explosion', type: 'normal', power: 250, accuracy: 100, pp: 5, description: 'The user attacks everything around it by causing a tremendous explosion. The user faints upon using this move.' },
+                { name: 'fury-swipes', type: 'normal', power: 18, accuracy: 80, pp: 15, description: 'The target is raked with sharp claws or scythes for two to five times in quick succession.' },
+                { name: 'bonemerang', type: 'ground', power: 50, accuracy: 90, pp: 10, description: 'The user throws the bone it holds. The bone loops to hit the target twice—coming and going.' },
+                { name: 'rest', type: 'psychic', power: null, accuracy: null, pp: 10, description: 'The user goes to sleep for two turns. This fully restores the user’s HP and heals any status conditions.' },
+                { name: 'rock-slide', type: 'rock', power: 75, accuracy: 90, pp: 10, description: 'Large boulders are hurled at the opposing Pokémon to inflict damage. This may also make the opposing Pokémon flinch.' },
+                { name: 'hyper-fang', type: 'normal', power: 80, accuracy: 90, pp: 15, description: 'The user bites hard on the target with its sharp front fangs. This may also make the target flinch.' },
+                { name: 'sharpen', type: 'normal', power: null, accuracy: null, pp: 30, description: 'The user reduces its polygon count to sharpen edges and raise its Attack stat.' },
+                { name: 'conversion', type: 'normal', power: null, accuracy: null, pp: 30, description: 'The user changes its type to become the same type as the move at the top of the list of moves it knows.' },
+                { name: 'tri-attack', type: 'normal', power: 80, accuracy: 100, pp: 10, description: 'The user strikes with a simultaneous three-beam attack. May also burn, freeze, or leave the target with paralysis.' },
+                { name: 'super-fang', type: 'normal', power: null, accuracy: 90, pp: 10, description: 'The user chomps hard on the target with its sharp front fangs. It cuts the target’s HP to half.' },
+                { name: 'slash', type: 'normal', power: 70, accuracy: 100, pp: 20, description: 'The target is attacked with a slash of claws or blades. Critical hits land more easily.' },
+                { name: 'substitute', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user makes a copy of itself using some of its HP. The copy serves as the user’s decoy.' },
+                { name: 'struggle', type: 'normal', power: 50, accuracy: null, pp: null, description: 'This attack is used in desperation only if the user has no PP. It also damages the user a little.' },
+                { name: 'sketch', type: 'normal', power: null, accuracy: null, pp: 1, description: 'It enables the user to permanently learn the move last used by the target. Once used, Sketch disappears.' },
+                { name: 'triple-kick', type: 'fighting', power: 10, accuracy: 90, pp: 10, description: 'A consecutive three-kick attack that becomes more powerful with each successful hit.' },
+                { name: 'thief', type: 'dark', power: 60, accuracy: 100, pp: 25, description: 'The user attacks and steals the target’s held item simultaneously. The user can’t steal if it holds an item.' },
+                { name: 'spider-web', type: 'bug', power: null, accuracy: null, pp: 10, description: 'The user ensnares the target with thin, gooey silk so it can’t flee from battle.' },
+                { name: 'mind-reader', type: 'normal', power: null, accuracy: null, pp: 5, description: 'The user senses the target’s movements with its mind to ensure its next attack does not miss the target.' },
+                { name: 'nightmare', type: 'ghost', power: null, accuracy: 100, pp: 15, description: 'A sleeping target sees a nightmare that inflicts some damage every turn.' },
+                { name: 'flame-wheel', type: 'fire', power: 60, accuracy: 100, pp: 25, description: 'The user cloaks itself in fire and charges at the target. This may also leave the target with a burn.' },
+                { name: 'snore', type: 'normal', power: 50, accuracy: 100, pp: 15, description: 'An attack that can be used only if the user is asleep. The harsh noise may also make the target flinch.' },
+                { name: 'curse', type: 'ghost', power: null, accuracy: null, pp: 10, description: 'A move that works differently for the Ghost type than for all other types.' },
+                { name: 'flail', type: 'normal', power: null, accuracy: 100, pp: 15, description: 'The user flails about aimlessly to attack. The less HP the user has, the greater the move’s power.' },
+                { name: 'conversion-2', type: 'normal', power: null, accuracy: null, pp: 30, description: 'The user changes its type to make itself resistant to the type of the attack the opponent used last.' },
+                { name: 'aeroblast', type: 'flying', power: 100, accuracy: 95, pp: 5, description: 'A vortex of air is shot at the target to inflict damage. Critical hits land more easily.' },
+                { name: 'cotton-spore', type: 'grass', power: null, accuracy: 100, pp: 40, description: 'The user releases cotton-like spores that cling to the target, harshly reducing its Speed stat.' },
+                { name: 'reversal', type: 'fighting', power: null, accuracy: 100, pp: 15, description: 'An all-out attack that becomes more powerful the less HP the user has.' },
+                { name: 'spite', type: 'ghost', power: null, accuracy: 100, pp: 10, description: 'The user unleashes its grudge on the move last used by the target by cutting 4 PP from it.' },
+                { name: 'powder-snow', type: 'ice', power: 40, accuracy: 100, pp: 25, description: 'The user attacks with a chilling gust of powdery snow. This may also freeze the opposing Pokémon.' },
+                { name: 'protect', type: 'normal', power: null, accuracy: null, pp: 10, description: 'It enables the user to evade all attacks. Its chance of failing rises if it is used in succession.' },
+                { name: 'mach-punch', type: 'fighting', power: 40, accuracy: 100, pp: 30, description: 'The user throws a punch at blinding speed. This move always goes first.' },
+                { name: 'scary-face', type: 'normal', power: null, accuracy: 100, pp: 10, description: 'The user frightens the target with a scary face to harshly lower its Speed stat.' },
+                { name: 'feint-attack', type: 'dark', power: 60, accuracy: null, pp: 20, description: 'The user approaches the target disarmingly, then throws a sucker punch. This attack never misses.' },
+                { name: 'sweet-kiss', type: 'fairy', power: null, accuracy: 75, pp: 10, description: 'The user kisses the target with a sweet, angelic cuteness that causes confusion.' },
+                { name: 'belly-drum', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user maximizes its Attack stat in exchange for HP equal to half its max HP.' },
+                { name: 'sludge-bomb', type: 'poison', power: 90, accuracy: 100, pp: 10, description: 'Unsanitary sludge is hurled at the target. This may also poison the target.' },
+                { name: 'mud-slap', type: 'ground', power: 20, accuracy: 100, pp: 10, description: 'The user hurls mud in the target’s face to inflict damage and lower its accuracy.' },
+                { name: 'octazooka', type: 'water', power: 65, accuracy: 85, pp: 10, description: 'The user attacks by spraying ink in the target’s face or eyes. This may also lower the target’s accuracy.' },
+                { name: 'spikes', type: 'ground', power: null, accuracy: null, pp: 20, description: 'The user lays a trap of spikes at the opposing team’s feet. The trap hurts Pokémon that switch into battle.' },
+                { name: 'zap-cannon', type: 'electric', power: 120, accuracy: 50, pp: 5, description: 'The user fires an electric blast like a cannon to inflict damage and cause paralysis.' },
+                { name: 'foresight', type: 'normal', power: null, accuracy: null, pp: 40, description: 'Enables a Ghost type target to be hit with Normal- and Fighting-type attacks. This also enables an evasive target to be hit.' },
+                { name: 'destiny-bond', type: 'ghost', power: null, accuracy: null, pp: 5, description: 'When this move is used, if the user faints, the Pokémon that landed the knockout hit also faints.' },
+                { name: 'perish-song', type: 'normal', power: null, accuracy: null, pp: 5, description: 'Any Pokémon that hears this song faints in three turns, unless it switches out of battle.' },
+                { name: 'icy-wind', type: 'ice', power: 55, accuracy: 95, pp: 15, description: 'The user attacks with a gust of chilled air. This also lowers the opposing Pokémon’s Speed stat.' },
+                { name: 'detect', type: 'fighting', power: null, accuracy: null, pp: 5, description: 'It enables the user to evade all attacks. Its chance of failing rises if it is used in succession.' },
+                { name: 'bone-rush', type: 'ground', power: 25, accuracy: 90, pp: 10, description: 'The user strikes the target with a hard bone two to five times in a row.' },
+                { name: 'lock-on', type: 'normal', power: null, accuracy: null, pp: 5, description: 'The user takes sure aim at the target. This ensures the next attack does not miss the target.' },
+                { name: 'outrage', type: 'dragon', power: 120, accuracy: 100, pp: 10, description: 'The user rampages and attacks for two to three turns. The user then becomes confused.' },
+                { name: 'sandstorm', type: 'rock', power: null, accuracy: null, pp: 10, description: 'A five-turn sandstorm is summoned to hurt all combatants except the Rock, Ground, and Steel types.' },
+                { name: 'giga-drain', type: 'grass', power: 75, accuracy: 100, pp: 10, description: 'A nutrient-draining attack. The user’s HP is restored by half the damage taken by the target.' },
+                { name: 'endure', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user endures any attack with at least 1 HP. Its chance of failing rises if it is used in succession.' },
+                { name: 'charm', type: 'fairy', power: null, accuracy: 100, pp: 20, description: 'The user gazes at the target rather charmingly, making it less wary. This harshly lowers the target’s Attack stat.' },
+                { name: 'rollout', type: 'rock', power: 30, accuracy: 90, pp: 20, description: 'The user continually rolls into the target over five turns. It becomes stronger each time it hits.' },
+                { name: 'false-swipe', type: 'normal', power: 40, accuracy: 100, pp: 40, description: 'A restrained attack that prevents the target from fainting. The target is left with at least 1 HP.' },
+                { name: 'swagger', type: 'normal', power: null, accuracy: 85, pp: 15, description: 'The user enrages and confuses the target. However, this also sharply raises the target’s Attack stat.' },
+                { name: 'milk-drink', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user restores its own HP by up to half of its max HP. It may also be used to heal an ally’s HP.' },
+                { name: 'spark', type: 'electric', power: 65, accuracy: 100, pp: 20, description: 'The user throws an electrically charged tackle at the target. This may also leave the target with paralysis.' },
+                { name: 'fury-cutter', type: 'bug', power: 40, accuracy: 95, pp: 20, description: 'The target is slashed with scythes or claws. Its power increases if it hits in succession.' },
+                { name: 'steel-wing', type: 'steel', power: 70, accuracy: 90, pp: 25, description: 'The target is hit with wings of steel. This may also raise the user’s Defense stat.' },
+                { name: 'mean-look', type: 'normal', power: null, accuracy: null, pp: 5, description: 'The user pins the target with a dark, arresting look. The target becomes unable to flee.' },
+                { name: 'attract', type: 'normal', power: null, accuracy: 100, pp: 15, description: 'If it is the opposite gender of the user, the target becomes infatuated and less likely to attack.' },
+                { name: 'sleep-talk', type: 'normal', power: null, accuracy: null, pp: 10, description: 'While it is asleep, the user randomly uses one of the moves it knows.' },
+                { name: 'heal-bell', type: 'normal', power: null, accuracy: null, pp: 5, description: 'The user makes a soothing bell chime to heal the status conditions of all the party Pokémon.' },
+                { name: 'return', type: 'normal', power: null, accuracy: 100, pp: 20, description: 'A full-power attack that grows more powerful the more the user likes its Trainer.' },
+                { name: 'present', type: 'normal', power: null, accuracy: 90, pp: 15, description: 'The user attacks by giving the target a gift with a hidden trap. It restores HP sometimes, however.' },
+                { name: 'frustration', type: 'normal', power: null, accuracy: 100, pp: 20, description: 'This full-power attack grows more powerful the less the user likes its Trainer.' },
+                { name: 'safeguard', type: 'normal', power: null, accuracy: null, pp: 25, description: 'The user creates a protective field that prevents status conditions for five turns.' },
+                { name: 'pain-split', type: 'normal', power: null, accuracy: null, pp: 20, description: 'The user adds its HP to the target’s HP, then equally shares the combined HP with the target.' },
+                { name: 'sacred-fire', type: 'fire', power: 100, accuracy: 95, pp: 5, description: 'The target is razed with a mystical fire of great intensity. This may also leave the target with a burn.' },
+                { name: 'magnitude', type: 'ground', power: null, accuracy: 100, pp: 30, description: 'The user looses a ground-shaking quake affecting everyone around the user. Its power varies.' },
+                { name: 'dynamic-punch', type: 'fighting', power: 100, accuracy: 50, pp: 5, description: 'The user punches the target with full, concentrated power. This confuses the target if it hits.' },
+                { name: 'megahorn', type: 'bug', power: 120, accuracy: 85, pp: 10, description: 'Using its tough and impressive horn, the user rams into the target with no letup.' },
+                { name: 'dragon-breath', type: 'dragon', power: 60, accuracy: 100, pp: 20, description: 'The user exhales a mighty gust that inflicts damage. This may also leave the target with paralysis.' },
+                { name: 'baton-pass', type: 'normal', power: null, accuracy: null, pp: 40, description: 'The user switches places with a party Pokémon in waiting and passes along any stat changes.' },
+                { name: 'encore', type: 'normal', power: null, accuracy: 100, pp: 5, description: 'The user compels the target to keep using only the move it last used for three turns.' },
+                { name: 'pursuit', type: 'dark', power: 40, accuracy: 100, pp: 20, description: 'An attack move that inflicts double damage if used on a target that is switching out of battle.' },
+                { name: 'rapid-spin', type: 'normal', power: 50, accuracy: 100, pp: 40, description: 'A spin attack that can also eliminate such moves as Bind, Wrap, Leech Seed, and Spikes.' },
+                { name: 'sweet-scent', type: 'normal', power: null, accuracy: 100, pp: 20, description: 'A sweet scent that harshly lowers opposing Pokémon’s evasiveness. This also lures wild Pokémon if used in grass, etc.' },
+                { name: 'iron-tail', type: 'steel', power: 100, accuracy: 75, pp: 15, description: 'The target is slammed with a steel-hard tail. This may also lower the target’s Defense stat.' },
+                { name: 'metal-claw', type: 'steel', power: 50, accuracy: 95, pp: 35, description: 'The target is raked with steel claws. This may also raise the user’s Attack stat.' },
+                { name: 'vital-throw', type: 'fighting', power: 70, accuracy: null, pp: 10, description: 'The user attacks last. In return, this throw move never misses.' },
+                { name: 'morning-sun', type: 'normal', power: null, accuracy: null, pp: 5, description: 'The user restores its own HP. The amount of HP regained varies with the weather.' },
+                { name: 'synthesis', type: 'grass', power: null, accuracy: null, pp: 5, description: 'The user restores its own HP. The amount of HP regained varies with the weather.' },
+                { name: 'moonlight', type: 'fairy', power: null, accuracy: null, pp: 5, description: 'The user restores its own HP. The amount of HP regained varies with the weather.' },
+                { name: 'hidden-power', type: 'normal', power: 60, accuracy: 100, pp: 15, description: 'A unique attack that varies in type depending on the Pokémon using it.' },
+                { name: 'cross-chop', type: 'fighting', power: 100, accuracy: 80, pp: 5, description: 'The user delivers a double chop with its forearms crossed. Critical hits land more easily.' },
+                { name: 'twister', type: 'dragon', power: 40, accuracy: 100, pp: 20, description: 'The user whips up a vicious tornado to tear at the opposing Pokémon. This may also make them flinch.' },
+                { name: 'rain-dance', type: 'water', power: null, accuracy: null, pp: 5, description: 'The user summons a heavy rain that falls for five turns, powering up Water-type moves.' },
+                { name: 'sunny-day', type: 'fire', power: null, accuracy: null, pp: 5, description: 'The user intensifies the sun for five turns, powering up Fire-type moves.' },
+                { name: 'crunch', type: 'dark', power: 80, accuracy: 100, pp: 15, description: 'The user crunches up the target with sharp fangs. This may also lower the target’s Defense stat.' },
+                { name: 'mirror-coat', type: 'psychic', power: null, accuracy: 100, pp: 20, description: 'A retaliation move that counters any special attack, inflicting double the damage taken.' },
+                { name: 'psych-up', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user hypnotizes itself into copying any stat change made by the target.' },
+                { name: 'extreme-speed', type: 'normal', power: 80, accuracy: 100, pp: 5, description: 'The user charges the target at blinding speed. This move always goes first.' },
+                { name: 'ancient-power', type: 'rock', power: 60, accuracy: 100, pp: 5, description: 'The user attacks with a prehistoric power. This may also raise all the user’s stats at once.' },
+                { name: 'shadow-ball', type: 'ghost', power: 80, accuracy: 100, pp: 15, description: 'The user hurls a shadowy blob at the target. This may also lower the target’s Sp. Def stat.' },
+                { name: 'future-sight', type: 'psychic', power: 120, accuracy: 100, pp: 10, description: 'Two turns after this move is used, a hunk of psychic energy attacks the target.' },
+                { name: 'rock-smash', type: 'fighting', power: 40, accuracy: 100, pp: 15, description: 'The user attacks with a punch that can shatter a rock. This may also lower the target’s Defense stat.' },
+                { name: 'whirlpool', type: 'water', power: 35, accuracy: 85, pp: 15, description: 'The user traps the target in a violent swirling whirlpool for four to five turns.' },
+                { name: 'beat-up', type: 'dark', power: null, accuracy: 100, pp: 10, description: 'The user gets all party Pokémon to attack the target. The more party Pokémon, the greater the number of attacks.' },
+                { name: 'fake-out', type: 'normal', power: 40, accuracy: 100, pp: 10, description: 'An attack that hits first and makes the target flinch. It only works the first turn the user is in battle.' },
+                { name: 'uproar', type: 'normal', power: 90, accuracy: 100, pp: 10, description: 'The user attacks in an uproar for three turns. During that time, no Pokémon can fall asleep.' },
+                { name: 'stockpile', type: 'normal', power: null, accuracy: null, pp: 20, description: 'The user charges up power and raises both its Defense and Sp. Def stats. The move can be used three times.' },
+                { name: 'spit-up', type: 'normal', power: null, accuracy: 100, pp: 10, description: 'The power stored using the move Stockpile is released at once in an attack. The stored power determines the move’s power.' },
+                { name: 'swallow', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The power stored using the move Stockpile is absorbed by the user to heal its HP. Storing more power heals more HP.' },
+                { name: 'heat-wave', type: 'fire', power: 95, accuracy: 90, pp: 10, description: 'The user attacks by exhaling hot breath on the opposing Pokémon. This may also leave those Pokémon with a burn.' },
+                { name: 'hail', type: 'ice', power: null, accuracy: null, pp: 10, description: 'The user summons a hailstorm lasting five turns. It damages all Pokémon except the Ice type.' },
+                { name: 'torment', type: 'dark', power: null, accuracy: 100, pp: 15, description: 'The user torments and enrages the target, making it incapable of using the same move twice in a row.' },
+                { name: 'flatter', type: 'dark', power: null, accuracy: 100, pp: 15, description: 'Flattery is used to confuse the target. However, this also raises the target’s Sp. Atk stat.' },
+                { name: 'will-o-wisp', type: 'fire', power: null, accuracy: 85, pp: 15, description: 'The user shoots a sinister, bluish-white flame at the target to inflict a burn.' },
+                { name: 'memento', type: 'dark', power: null, accuracy: 100, pp: 10, description: 'The user faints when using this move. In return, it harshly lowers the target’s Attack and Sp. Atk stats.' },
+                { name: 'facade', type: 'normal', power: 70, accuracy: 100, pp: 20, description: 'This attack move doubles its power if the user is poisoned, burned, or paralyzed.' },
+                { name: 'focus-punch', type: 'fighting', power: 150, accuracy: 100, pp: 20, description: 'The user focuses its mind before launching a punch. This move fails if the user is hit before it is used.' },
+                { name: 'smelling-salts', type: 'normal', power: 70, accuracy: 100, pp: 10, description: 'This attack move doubles its power if the target is paralyzed. This also cures the target’s paralysis, however.' },
+                { name: 'follow-me', type: 'normal', power: null, accuracy: null, pp: 20, description: 'The user draws attention to itself, making all targets take aim only at the user.' },
+                { name: 'nature-power', type: 'normal', power: null, accuracy: null, pp: 20, description: 'This attack makes use of nature’s power. Its effects vary depending on the user’s environment.' },
+                { name: 'charge', type: 'electric', power: null, accuracy: null, pp: 20, description: 'The user boosts the power of the Electric move it uses on the next turn. This also raises the user’s Sp. Def stat.' },
+                { name: 'taunt', type: 'dark', power: null, accuracy: 100, pp: 20, description: 'The target is taunted into a rage that allows it to use only attack moves for three turns.' },
+                { name: 'helping-hand', type: 'normal', power: null, accuracy: null, pp: 20, description: 'The user assists an ally by boosting the power of that ally’s attack.' },
+                { name: 'trick', type: 'psychic', power: null, accuracy: 100, pp: 10, description: 'The user catches the target off guard and swaps its held item with its own.' },
+                { name: 'role-play', type: 'psychic', power: null, accuracy: null, pp: 10, description: 'The user mimics the target completely, copying the target’s natural Ability.' },
+                { name: 'wish', type: 'normal', power: null, accuracy: null, pp: 10, description: 'One turn after this move is used, the user or its replacement’s HP is restored by half the user’s max HP.' },
+                { name: 'assist', type: 'normal', power: null, accuracy: null, pp: 20, description: 'The user hurriedly and randomly uses a move among those known by other Pokémon in the party.' },
+                { name: 'ingrain', type: 'grass', power: null, accuracy: null, pp: 20, description: 'The user lays roots that restore its HP on every turn. Because it is rooted, it can’t switch out.' },
+                { name: 'superpower', type: 'fighting', power: 120, accuracy: 100, pp: 5, description: 'The user attacks the target with great power. However, this also lowers the user’s Attack and Defense stats.' },
+                { name: 'magic-coat', type: 'psychic', power: null, accuracy: null, pp: 15, description: 'A barrier reflects back to the target moves like Leech Seed and moves that damage status.' },
+                { name: 'recycle', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user recycles a held item that has been used in battle so it can be used again.' },
+                { name: 'revenge', type: 'fighting', power: 60, accuracy: 100, pp: 10, description: 'An attack move that inflicts double the damage if the user has been hurt by the target in the same turn.' },
+                { name: 'brick-break', type: 'fighting', power: 75, accuracy: 100, pp: 15, description: 'The user attacks with a swift chop. It can also break barriers, such as Light Screen and Reflect.' },
+                { name: 'yawn', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user lets loose a huge yawn that lulls the target into falling asleep on the next turn.' },
+                { name: 'knock-off', type: 'dark', power: 65, accuracy: 100, pp: 20, description: 'The user slaps down the target’s held item, and that item can’t be used in that battle. The move does more damage if the target has a held item.' },
+                { name: 'endeavor', type: 'normal', power: null, accuracy: 100, pp: 5, description: 'This attack move cuts down the target’s HP to equal the user’s HP.' },
+                { name: 'eruption', type: 'fire', power: 150, accuracy: 100, pp: 5, description: 'The user attacks opposing Pokémon with explosive fury. The lower the user’s HP, the lower the move’s power.' },
+                { name: 'skill-swap', type: 'psychic', power: null, accuracy: null, pp: 10, description: 'The user employs its psychic power to exchange Abilities with the target.' },
+                { name: 'imprison', type: 'psychic', power: null, accuracy: null, pp: 10, description: 'If opposing Pokémon know any move also known by the user, they are prevented from using it.' },
+                { name: 'refresh', type: 'normal', power: null, accuracy: null, pp: 20, description: 'The user rests to cure itself of a poisoning, burn, or paralysis.' },
+                { name: 'grudge', type: 'ghost', power: null, accuracy: null, pp: 5, description: 'If the user faints, the user’s grudge fully depletes the PP of the opponent’s move that knocked it out.' },
+                { name: 'snatch', type: 'dark', power: null, accuracy: null, pp: 10, description: 'The user steals the effects of any attempts to use a healing or stat-changing move.' },
+                { name: 'secret-power', type: 'normal', power: 70, accuracy: 100, pp: 20, description: 'The additional effects of this attack depend upon where it was used.' },
+                { name: 'dive', type: 'water', power: 80, accuracy: 100, pp: 10, description: 'Diving on the first turn, the user floats up and attacks on the next turn.' },
+                { name: 'arm-thrust', type: 'fighting', power: 15, accuracy: 100, pp: 20, description: 'The user lets loose a flurry of open-palmed arm thrusts that hit two to five times in a row.' },
+                { name: 'camouflage', type: 'normal', power: null, accuracy: null, pp: 20, description: 'The user’s type is changed depending on its environment, such as at water’s edge, in grass, or in a cave.' },
+                { name: 'tail-glow', type: 'bug', power: null, accuracy: null, pp: 20, description: 'The user stares at flashing lights to focus its mind, drastically raising its Sp. Atk stat.' },
+                { name: 'luster-purge', type: 'psychic', power: 70, accuracy: 100, pp: 5, description: 'The user lets loose a damaging burst of light. This may also lower the target’s Sp. Def stat.' },
+                { name: 'mist-ball', type: 'psychic', power: 70, accuracy: 100, pp: 5, description: 'A mist-like flurry of down envelops and damages the target. This may also lower the target’s Sp. Atk stat.' },
+                { name: 'feather-dance', type: 'flying', power: null, accuracy: 100, pp: 15, description: 'The user covers the target’s body with a mass of down that harshly lowers the target’s Attack stat.' },
+                { name: 'teeter-dance', type: 'normal', power: null, accuracy: 100, pp: 20, description: 'The user performs a wobbly dance that confuses the Pokémon around it.' },
+                { name: 'blaze-kick', type: 'fire', power: 85, accuracy: 90, pp: 10, description: 'The user launches a kick that lands a critical hit more easily. This may also leave the target with a burn.' },
+                { name: 'mud-sport', type: 'ground', power: null, accuracy: null, pp: 15, description: 'The user covers itself with mud. It weakens Electric-type moves for five turns.' },
+                { name: 'ice-ball', type: 'ice', power: 30, accuracy: 90, pp: 20, description: 'The user continually rolls into the target over five turns. It becomes stronger each time it hits.' },
+                { name: 'needle-arm', type: 'grass', power: 60, accuracy: 100, pp: 15, description: 'The user attacks by wildly swinging its thorny arms. This may also make the target flinch.' },
+                { name: 'slack-off', type: 'normal', power: null, accuracy: null, pp: 10, description: 'The user slacks off, restoring its own HP by up to half of its max HP.' },
+                { name: 'hyper-voice', type: 'normal', power: 90, accuracy: 100, pp: 10, description: 'The user lets loose a horribly echoing shout with the power to inflict damage.' },
+                { name: 'poison-fang', type: 'poison', power: 50, accuracy: 100, pp: 15, description: 'The user bites the target with toxic fangs. This may also leave the target badly poisoned.' },
+                { name: 'crush-claw', type: 'normal', power: 75, accuracy: 95, pp: 10, description: 'The user slashes the target with hard and sharp claws. This may also lower the target’s Defense stat.' },
+                { name: 'blast-burn', type: 'fire', power: 150, accuracy: 90, pp: 5, description: 'The target is razed by a fiery explosion. The user can’t move on the next turn.' },
+                { name: 'hydro-cannon', type: 'water', power: 150, accuracy: 90, pp: 5, description: 'The target is hit with a watery blast. The user can’t move on the next turn.' },
+                { name: 'meteor-mash', type: 'steel', power: 90, accuracy: 90, pp: 10, description: 'The target is hit with a hard punch fired like a meteor. This may also raise the user’s Attack stat.' },
+                { name: 'astonish', type: 'ghost', power: 30, accuracy: 100, pp: 15, description: 'The user attacks the target while shouting in a startling fashion. This may also make the target flinch.' },
+                { name: 'weather-ball', type: 'normal', power: 50, accuracy: 100, pp: 10, description: 'An attack move that varies in power and type depending on the weather.' },
+                { name: 'aromatherapy', type: 'grass', power: null, accuracy: null, pp: 5, description: 'The user releases a soothing scent that heals all status conditions affecting the user’s party.' },
+                { name: 'fake-tears', type: 'dark', power: null, accuracy: 100, pp: 20, description: 'The user feigns crying to fluster the target, harshly lowering its Sp. Def stat.' },
+                { name: 'air-cutter', type: 'flying', power: 60, accuracy: 95, pp: 25, description: 'The user launches razor-like wind to slash opposing Pokémon. Critical hits land more easily.' },
+                { name: 'overheat', type: 'fire', power: 130, accuracy: 90, pp: 5, description: 'The user attacks the target at full power. The attack’s recoil harshly lowers the user’s Sp. Atk stat.' },
+                { name: 'odor-sleuth', type: 'normal', power: null, accuracy: null, pp: 40, description: 'Enables a Ghost-type target to be hit with Normal- and Fighting-type attacks. This also enables an evasive target to be hit.' },
+                { name: 'rock-tomb', type: 'rock', power: 60, accuracy: 95, pp: 15, description: 'Boulders are hurled at the target. This also lowers the target’s Speed stat by preventing its movement.' },
+                { name: 'silver-wind', type: 'bug', power: 60, accuracy: 100, pp: 5, description: 'The target is attacked with powdery scales blown by wind. This may also raise all the user’s stats at once.' },
+                { name: 'metal-sound', type: 'steel', power: null, accuracy: 85, pp: 40, description: 'A horrible sound like scraping metal harshly lowers the target’s Sp. Def stat.' },
+                { name: 'grass-whistle', type: 'grass', power: null, accuracy: 55, pp: 15, description: 'The user plays a pleasant melody that lulls the target into a deep sleep.' },
+                { name: 'tickle', type: 'normal', power: null, accuracy: 100, pp: 20, description: 'The user tickles the target into laughing, reducing its Attack and Defense stats.' },
+                { name: 'cosmic-power', type: 'psychic', power: null, accuracy: null, pp: 20, description: 'The user absorbs a mystical power from space to raise its Defense and Sp. Def stats.' },
+                { name: 'water-spout', type: 'water', power: 150, accuracy: 100, pp: 5, description: 'The user spouts water to damage opposing Pokémon. The lower the user’s HP, the lower the move’s power.' },
+                { name: 'signal-beam', type: 'bug', power: 75, accuracy: 100, pp: 15, description: 'The user attacks with a sinister beam of light. This may also confuse the target.' },
+                { name: 'shadow-punch', type: 'ghost', power: 60, accuracy: null, pp: 20, description: 'The user throws a punch from the shadows. This attack never misses.' },
+                { name: 'extrasensory', type: 'psychic', power: 80, accuracy: 100, pp: 30, description: 'The user attacks with an odd, unseeable power. This may also make the target flinch.' },
+                { name: 'sky-uppercut', type: 'fighting', power: 85, accuracy: 90, pp: 15, description: 'The user attacks the target with an uppercut thrown skyward with force.' },
+                { name: 'sand-tomb', type: 'ground', power: 35, accuracy: 85, pp: 15, description: 'The user traps the target inside a harshly raging sandstorm for four to five turns.' },
+                { name: 'sheer-cold', type: 'ice', power: null, accuracy: null, pp: 5, description: 'The target faints instantly. It’s less likely to hit the target if it’s used by Pokémon other than Ice types.' },
+                { name: 'muddy-water', type: 'water', power: 90, accuracy: 85, pp: 10, description: 'The user attacks by shooting muddy water at the opposing team. This may also lower their accuracy.' },
+                { name: 'bullet-seed', type: 'grass', power: 25, accuracy: 100, pp: 30, description: 'The user forcefully shoots seeds at the target two to five times in a row.' },
+                { name: 'aerial-ace', type: 'flying', power: 60, accuracy: null, pp: 20, description: 'The user confounds the target with speed, then slashes. The attack lands without fail.' },
+                { name: 'icicle-spear', type: 'ice', power: 25, accuracy: 100, pp: 30, description: 'The user launches sharp icicles at the target two to five times in a row.' },
+                { name: 'iron-defense', type: 'steel', power: null, accuracy: null, pp: 15, description: 'The user hardens its body’s surface like iron, sharply raising its Defense stat.' },
+                { name: 'block', type: 'normal', power: null, accuracy: null, pp: 5, description: 'The user blocks the target’s way with arms spread wide to prevent escape.' },
+                { name: 'howl', type: 'normal', power: null, accuracy: null, pp: 40, description: 'The user howls loudly to raise its spirit, which raises its Attack stat.' },
+                { name: 'dragon-claw', type: 'dragon', power: 80, accuracy: 100, pp: 15, description: 'The user slashes the target with huge, sharp claws.' },
+                { name: 'frenzy-plant', type: 'grass', power: 150, accuracy: 90, pp: 5, description: 'The user slams the target with an enormous tree. The user can’t move on the next turn.' },
+                { name: 'bulk-up', type: 'fighting', power: null, accuracy: null, pp: 20, description: 'The user tenses its muscles to bulk up its body, raising both its Attack and Defense stats.' },
+                { name: 'bounce', type: 'flying', power: 85, accuracy: 85, pp: 5, description: 'The user bounces up high, then drops on the target on the second turn. This may also leave the target with paralysis.' },
+                { name: 'mud-shot', type: 'ground', power: 55, accuracy: 95, pp: 15, description: 'The user attacks by hurling a blob of mud at the target. This also lowers the target’s Speed stat.' },
+                { name: 'poison-tail', type: 'poison', power: 50, accuracy: 100, pp: 25, description: 'The user hits the target with its tail. This may also poison the target. Critical hits land more easily.' },
+                { name: 'covet', type: 'normal', power: 60, accuracy: 100, pp: 40, description: 'The user endearingly approaches the target, then steals the target’s held item.' },
+                { name: 'volt-tackle', type: 'electric', power: 120, accuracy: 100, pp: 15, description: 'The user electrifies itself, then charges at the target. This also damages the user quite a lot.' },
+                { name: 'magical-leaf', type: 'grass', power: 60, accuracy: null, pp: 20, description: 'The user scatters curious leaves that chase the target. This attack never misses.' },
+                { name: 'water-sport', type: 'water', power: null, accuracy: null, pp: 15, description: 'The user soaks the battlefield with water. This weakens Fire-type moves for five turns.' },
+                { name: 'calm-mind', type: 'psychic', power: null, accuracy: null, pp: 20, description: 'The user quietly focuses its mind and calms its spirit to raise its Sp. Atk and Sp. Def stats.' },
+                { name: 'leaf-blade', type: 'grass', power: 90, accuracy: 100, pp: 15, description: 'The user handles a sharp leaf like a sword and attacks by cutting its target. Critical hits land more easily.' },
+                { name: 'dragon-dance', type: 'dragon', power: null, accuracy: null, pp: 20, description: 'The user vigorously performs a mystic, powerful dance that boosts its Attack and Speed stats.' },
+                { name: 'rock-blast', type: 'rock', power: 25, accuracy: 90, pp: 10, description: 'The user hurls hard rocks at the target. Two to five rocks are launched in quick succession.' },
+                { name: 'shock-wave', type: 'electric', power: 60, accuracy: null, pp: 20, description: 'The user strikes the target with a quick jolt of electricity. This attack never misses.' },
+                { name: 'water-pulse', type: 'water', power: 60, accuracy: 100, pp: 20, description: 'The user attacks the target with a pulsing blast of water. This may also confuse the target.' },
+                { name: 'doom-desire', type: 'steel', power: 140, accuracy: 100, pp: 5, description: 'Two turns after this move is used, a concentrated bundle of light blasts the target.' },
+                { name: 'psycho-boost', type: 'psychic', power: 140, accuracy: 90, pp: 5, description: 'The user attacks the target at full power. The attack’s recoil harshly lowers the user’s Sp. Atk stat.' },
+                { name: 'roost', type: 'flying', power: null, accuracy: null, pp: 10, description: 'The user lands and rests its body. This move restores the user’s HP by up to half of its max HP.' },
+                { name: 'gravity', type: 'psychic', power: null, accuracy: null, pp: 5, description: 'Gravity is intensified for five turns, making moves involving flying unusable and negating Levitate.' },
+                { name: 'miracle-eye', type: 'psychic', power: null, accuracy: null, pp: 40, description: 'Enables a Dark-type target to be hit by Psychic-type attacks. It also enables an evasive target to be hit.' },
+                { name: 'wake-up-slap', type: 'fighting', power: 70, accuracy: 100, pp: 10, description: 'This attack inflicts big damage on a sleeping target. This also wakes the target up, however.' },
+                { name: 'hammer-arm', type: 'fighting', power: 100, accuracy: 90, pp: 10, description: 'The user swings and hits with its strong, heavy fist. It lowers the user’s Speed, however.' },
+                { name: 'gyro-ball', type: 'steel', power: null, accuracy: 100, pp: 5, description: 'The user tackles the target with a high-speed spin. The slower the user compared to the target, the greater the move’s power.' },
+                { name: 'healing-wish', type: 'psychic', power: null, accuracy: null, pp: 10, description: 'The user faints. In return, the Pokémon taking its place will have its HP restored and status conditions cured.' },
+                { name: 'brine', type: 'water', power: 65, accuracy: 100, pp: 10, description: 'If the target’s HP is half or less, this attack will hit with double the power.' },
+                { name: 'natural-gift', type: 'normal', power: null, accuracy: 100, pp: 15, description: 'The user draws power to attack by using its held Berry. The Berry determines the move’s type and power.' },
+                { name: 'feint', type: 'normal', power: 30, accuracy: 100, pp: 10, description: 'This move hits even if the target protects itself.' },
+                { name: 'pluck', type: 'flying', power: 60, accuracy: 100, pp: 20, description: 'The user pecks the target. If the target is holding a Berry, the user eats it and gains its effect.' },
+                { name: 'tailwind', type: 'flying', power: null, accuracy: null, pp: 15, description: 'The user whips up a turbulent whirlwind that ups the Speed stat of the user and its allies for four turns.' },
+                { name: 'acupressure', type: 'normal', power: null, accuracy: null, pp: 30, description: 'The user applies pressure to stress points, sharply boosting one of its or its allies’ stats.' },
+                { name: 'metal-burst', type: 'steel', power: null, accuracy: 100, pp: 10, description: 'The user retaliates with much greater force against the opponent that last inflicted damage on it.' },
+                { name: 'u-turn', type: 'bug', power: 70, accuracy: 100, pp: 20, description: 'After making its attack, the user rushes back to switch places with a party Pokémon in waiting.' },
+                { name: 'close-combat', type: 'fighting', power: 120, accuracy: 100, pp: 5, description: 'The user fights the target up close without guarding itself. This also lowers the user’s Defense and Sp. Def stats.' },
+                { name: 'payback', type: 'dark', power: 50, accuracy: 100, pp: 10, description: 'The user stores power, then attacks. If the user moves after the target, this attack’s power will be doubled.' },
+                { name: 'assurance', type: 'dark', power: 60, accuracy: 100, pp: 10, description: 'If the target has already taken some damage in the same turn, this attack’s power is doubled.' },
+                { name: 'embargo', type: 'dark', power: null, accuracy: 100, pp: 15, description: 'It prevents the target from using its held item. Its Trainer is also prevented from using items on it.' },
+                { name: 'fling', type: 'dark', power: null, accuracy: 100, pp: 10, description: 'The user flings its held item at the target to attack. Its power and effects depend on the item.' },
+                { name: 'psycho-shift', type: 'psychic', power: null, accuracy: 100, pp: 10, description: 'Using its psychic power of suggestion, the user transfers its status conditions to the target.' },
+                { name: 'trump-card', type: 'normal', power: null, accuracy: null, pp: 5, description: 'The fewer PP this move has, the greater its power.' },
+                { name: 'heal-block', type: 'psychic', power: null, accuracy: 100, pp: 15, description: 'For five turns, the target is prevented from regaining HP through moves, Abilities, or held items.' },
+                { name: 'wring-out', type: 'normal', power: null, accuracy: 100, pp: 5, description: 'The user powerfully wrings the target. The more HP the target has, the greater the move’s power.' },
+                { name: 'power-trick', type: 'psychic', power: null, accuracy: null, pp: 10, description: 'The user employs its psychic power to switch its Attack stat with its Defense stat.' },
+                { name: 'gastro-acid', type: 'poison', power: null, accuracy: 100, pp: 10, description: 'The user hurls up its stomach acids on the target. The fluid eliminates the effect of the target’s Ability.' },
+                { name: 'lucky-chant', type: 'normal', power: null, accuracy: null, pp: 30, description: 'The user chants an incantation toward the sky, preventing opposing Pokémon from landing critical hits.' },
+                { name: 'me-first', type: 'normal', power: null, accuracy: null, pp: 20, description: 'The user tries to cut ahead of the target to steal and use the target’s intended move with greater power.' },
+                { name: 'copycat', type: 'normal', power: null, accuracy: null, pp: 20, description: 'The user mimics the move used immediately before it. The move fails if no other move has been used yet.' },
+                { name: 'power-swap', type: 'psychic', power: null, accuracy: null, pp: 10, description: 'The user employs its psychic power to switch changes to its Attack and Sp. Atk with the target.' },
+                { name: 'guard-swap', type: 'psychic', power: null, accuracy: null, pp: 10, description: 'The user employs its psychic power to switch changes to its Defense and Sp. Def with the target.' },
+                { name: 'punishment', type: 'dark', power: null, accuracy: 100, pp: 5, description: 'This attack’s power increases the more the target has powered up with stat changes.' },
+                { name: 'last-resort', type: 'normal', power: 140, accuracy: 100, pp: 5, description: 'This move can be used only after the user has used all the other moves it knows in the battle.' },
+                { name: 'worry-seed', type: 'grass', power: null, accuracy: 100, pp: 10, description: 'A seed that causes worry is planted on the target. It prevents sleep by making the target’s Ability Insomnia.' },
+                { name: 'sucker-punch', type: 'dark', power: 70, accuracy: 100, pp: 5, description: 'This move enables the user to attack first. This move fails if the target is not readying an attack.' },
+                { name: 'toxic-spikes', type: 'poison', power: null, accuracy: null, pp: 20, description: 'The user lays a trap of poison spikes at the feet of the opposing team. The spikes will poison opposing Pokémon that switch into battle.' },
+                { name: 'heart-swap', type: 'psychic', power: null, accuracy: null, pp: 10, description: 'The user employs its psychic power to switch stat changes with the target.' },
+                { name: 'aqua-ring', type: 'water', power: null, accuracy: null, pp: 20, description: 'The user envelops itself in a veil made of water. It regains some HP every turn.' },
+                { name: 'magnet-rise', type: 'electric', power: null, accuracy: null, pp: 10, description: 'The user levitates using electrically generated magnetism for five turns.' },
+                { name: 'flare-blitz', type: 'fire', power: 120, accuracy: 100, pp: 15, description: 'The user cloaks itself in fire and charges the target. The user sustains serious damage and may leave the target with a burn.' },
+                { name: 'force-palm', type: 'fighting', power: 60, accuracy: 100, pp: 10, description: 'The target is attacked with a shock wave. This may also leave the target with paralysis.' },
+                { name: 'aura-sphere', type: 'fighting', power: 80, accuracy: null, pp: 20, description: 'The user lets loose a blast of aura power from deep within its body at the target. This attack never misses.' },
+                { name: 'rock-polish', type: 'rock', power: null, accuracy: null, pp: 20, description: 'The user polishes its body to reduce drag. This can sharply raise the Speed stat.' },
+                { name: 'poison-jab', type: 'poison', power: 80, accuracy: 100, pp: 20, description: 'The target is stabbed with a tentacle, arm, or the like steeped in poison. This may also poison the target.' },
+                { name: 'dark-pulse', type: 'dark', power: 80, accuracy: 100, pp: 15, description: 'The user releases a horrible aura imbued with dark thoughts. This may also make the target flinch.' },
+                { name: 'night-slash', type: 'dark', power: 70, accuracy: 100, pp: 15, description: 'The user slashes the target the instant an opportunity arises. Critical hits land more easily.' },
+                { name: 'aqua-tail', type: 'water', power: 90, accuracy: 90, pp: 10, description: 'The user attacks by swinging its tail as if it were a vicious wave in a raging storm.' },
+                { name: 'seed-bomb', type: 'grass', power: 80, accuracy: 100, pp: 15, description: 'The user slams a barrage of hard-shelled seeds down on the target from above.' },
+                { name: 'air-slash', type: 'flying', power: 75, accuracy: 95, pp: 20, description: 'The user attacks with a blade of air that slices even the sky. This may also make the target flinch.' },
+                { name: 'x-scissor', type: 'bug', power: 80, accuracy: 100, pp: 15, description: 'The user slashes at the target by crossing its scythes or claws as if they were a pair of scissors.' },
+                { name: 'bug-buzz', type: 'bug', power: 90, accuracy: 100, pp: 10, description: 'The user generates a damaging sound wave by vibration. This may also lower the target’s Sp. Def stat.' },
+                { name: 'dragon-pulse', type: 'dragon', power: 85, accuracy: 100, pp: 10, description: 'The target is attacked with a shock wave generated by the user’s gaping mouth.' },
+                { name: 'dragon-rush', type: 'dragon', power: 100, accuracy: 75, pp: 10, description: 'The user tackles the target while exhibiting overwhelming menace. This may also make the target flinch.' },
+                { name: 'power-gem', type: 'rock', power: 80, accuracy: 100, pp: 20, description: 'The user attacks with a ray of light that sparkles as if it were made of gemstones.' },
+                { name: 'drain-punch', type: 'fighting', power: 75, accuracy: 100, pp: 10, description: 'An energy-draining punch. The user’s HP is restored by half the damage taken by the target.' },
+                { name: 'vacuum-wave', type: 'fighting', power: 40, accuracy: 100, pp: 30, description: 'The user whirls its fists to send a wave of pure vacuum at the target. This move always goes first.' },
+                { name: 'focus-blast', type: 'fighting', power: 120, accuracy: 70, pp: 5, description: 'The user heightens its mental focus and unleashes its power. This may also lower the target’s Sp. Def stat.' },
+                { name: 'energy-ball', type: 'grass', power: 90, accuracy: 100, pp: 10, description: 'The user draws power from nature and fires it at the target. This may also lower the target’s Sp. Def stat.' },
+                { name: 'brave-bird', type: 'flying', power: 120, accuracy: 100, pp: 15, description: 'The user tucks in its wings and charges from a low altitude. This also damages the user quite a lot.' },
+                { name: 'earth-power', type: 'ground', power: 90, accuracy: 100, pp: 10, description: 'The user makes the ground under the target erupt with power. This may also lower the target’s Sp. Def stat.' },
+                { name: 'switcheroo', type: 'dark', power: null, accuracy: 100, pp: 10, description: 'The user trades held items with the target faster than the eye can follow.' },
+                { name: 'giga-impact', type: 'normal', power: 150, accuracy: 90, pp: 5, description: 'The user charges at the target using every bit of its power. The user can’t move on the next turn.' },
+                { name: 'nasty-plot', type: 'dark', power: null, accuracy: null, pp: 20, description: 'The user stimulates its brain by thinking bad thoughts. This sharply raises the user’s Sp. Atk stat.' },
+                { name: 'bullet-punch', type: 'steel', power: 40, accuracy: 100, pp: 30, description: 'The user strikes the target with tough punches as fast as bullets. This move always goes first.' },
+                { name: 'avalanche', type: 'ice', power: 60, accuracy: 100, pp: 10, description: 'An attack move that inflicts double the damage if the user has been hurt by the target in the same turn.' },
+                { name: 'ice-shard', type: 'ice', power: 40, accuracy: 100, pp: 30, description: 'The user flash freezes chunks of ice and hurls them at the target. This move always goes first.' },
+                { name: 'shadow-claw', type: 'ghost', power: 70, accuracy: 100, pp: 15, description: 'The user slashes with a sharp claw made from shadows. Critical hits land more easily.' },
+                { name: 'thunder-fang', type: 'electric', power: 65, accuracy: 95, pp: 15, description: 'The user bites with electrified fangs. This may also make the target flinch or leave it with paralysis.' },
+                { name: 'ice-fang', type: 'ice', power: 65, accuracy: 95, pp: 15, description: 'The user bites with cold-infused fangs. This may also make the target flinch or leave it frozen.' },
+                { name: 'fire-fang', type: 'fire', power: 65, accuracy: 95, pp: 15, description: 'The user bites with flame-cloaked fangs. This may also make the target flinch or leave it with a burn.' },
+                { name: 'shadow-sneak', type: 'ghost', power: 40, accuracy: 100, pp: 30, description: 'The user extends its shadow and attacks the target from behind. This move always goes first.' },
+                { name: 'mud-bomb', type: 'ground', power: 65, accuracy: 85, pp: 10, description: 'The user launches a hard-packed mud ball to attack. This may also lower the target’s accuracy.' },
+                { name: 'psycho-cut', type: 'psychic', power: 70, accuracy: 100, pp: 20, description: 'The user tears at the target with blades formed by psychic power. Critical hits land more easily.' },
+                { name: 'zen-headbutt', type: 'psychic', power: 80, accuracy: 90, pp: 15, description: 'The user focuses its willpower to its head and attacks the target. This may also make the target flinch.' },
+                { name: 'mirror-shot', type: 'steel', power: 65, accuracy: 85, pp: 10, description: 'The user lets loose a flash of energy at the target from its polished body. This may also lower the target’s accuracy.' },
+                { name: 'flash-cannon', type: 'steel', power: 80, accuracy: 100, pp: 10, description: 'The user gathers all its light energy and releases it at once. This may also lower the target’s Sp. Def stat.' },
+                { name: 'rock-climb', type: 'normal', power: 90, accuracy: 85, pp: 20, description: 'The user attacks the target by smashing into it with incredible force. This may also confuse the target.' },
+                { name: 'defog', type: 'flying', power: null, accuracy: null, pp: 15, description: 'A strong wind blows away the target’s obstacles such as Reflect or Light Screen. This also lowers the target’s evasiveness.' },
+                { name: 'trick-room', type: 'psychic', power: null, accuracy: null, pp: 5, description: 'The user creates a bizarre area in which slower Pokémon get to move first for five turns.' },
+                { name: 'draco-meteor', type: 'dragon', power: 130, accuracy: 90, pp: 5, description: 'Comets are summoned down from the sky onto the target. The attack’s recoil harshly lowers the user’s Sp. Atk stat.' },
+                { name: 'discharge', type: 'electric', power: 80, accuracy: 100, pp: 15, description: 'The user strikes everything around it by letting loose a flare of electricity. This may also cause paralysis.' },
+                { name: 'lava-plume', type: 'fire', power: 80, accuracy: 100, pp: 15, description: 'The user torches everything around it in an inferno of scarlet flames. This may also leave those it hits with a burn.' },
+                { name: 'leaf-storm', type: 'grass', power: 130, accuracy: 90, pp: 5, description: 'The user whips up a storm of leaves around the target. The attack’s recoil harshly lowers the user’s Sp. Atk stat.' },
+                { name: 'power-whip', type: 'grass', power: 120, accuracy: 85, pp: 10, description: 'The user violently whirls its vines, tentacles, or the like to harshly lash the target.' },
+                { name: 'rock-wrecker', type: 'rock', power: 150, accuracy: 90, pp: 5, description: 'The user launches a huge boulder at the target to attack. The user can’t move on the next turn.' },
+                { name: 'cross-poison', type: 'poison', power: 70, accuracy: 100, pp: 20, description: 'A slashing attack with a poisonous blade that may also poison the target. Critical hits land more easily.' },
+                { name: 'gunk-shot', type: 'poison', power: 120, accuracy: 80, pp: 5, description: 'The user shoots filthy garbage at the target to attack. This may also poison the target.' },
+                { name: 'iron-head', type: 'steel', power: 80, accuracy: 100, pp: 15, description: 'The user slams the target with its steel-hard head. This may also make the target flinch.' },
+                { name: 'magnet-bomb', type: 'steel', power: 60, accuracy: null, pp: 20, description: 'The user launches steel bombs that stick to the target. This attack never misses.' },
+                { name: 'stone-edge', type: 'rock', power: 100, accuracy: 80, pp: 5, description: 'The user stabs the target with a sharpened stone. Critical hits land more easily.' },
+                { name: 'captivate', type: 'normal', power: null, accuracy: 100, pp: 20, description: 'If it is the opposite gender of the user, the target is charmed into harshly lowering its Sp. Atk stat.' },
+                { name: 'stealth-rock', type: 'rock', power: null, accuracy: null, pp: 20, description: 'The user lays a trap of levitating stones around the opposing team. The trap hurts opposing Pokémon that switch into battle.' },
+                { name: 'grass-knot', type: 'grass', power: null, accuracy: 100, pp: 20, description: 'The user snares the target with grass and trips it. The heavier the target, the greater the move’s power.' },
+                { name: 'chatter', type: 'flying', power: 65, accuracy: 100, pp: 20, description: 'The user attacks the target with sound waves of deafening chatter. This confuses the target if it hits.' },
+                { name: 'judgment', type: 'normal', power: 100, accuracy: 100, pp: 10, description: 'The user releases countless shots of light at the target. Its type varies with the kind of Plate the user is holding.' },
+                { name: 'bug-bite', type: 'bug', power: 60, accuracy: 100, pp: 20, description: 'The user bites the target. If the target is holding a Berry, the user eats it and gains its effect.' },
+                { name: 'charge-beam', type: 'electric', power: 50, accuracy: 90, pp: 10, description: 'The user attacks with an electric charge. The user may use any remaining electricity to raise its Sp. Atk stat.' },
+                { name: 'wood-hammer', type: 'grass', power: 120, accuracy: 100, pp: 15, description: 'The user slams its rugged body into the target to attack. This also damages the user quite a lot.' }, 
+                ]
+
+
+            const movesList = document.getElementById('moves-list');
+            moves.forEach(move => {
+                const moveCard = document.createElement('div');
+                moveCard.classList.add('col-md-4', 'move-card');
+                moveCard.innerHTML = `
+                    <div class="card-title">${move.name}</div>
+                    <div class="card-subtitle">${move.type} type</div>
+                    <div class="move-details">
+                        <span>Power: ${move.power !== null ? move.power : '—'}</span>
+                        <span>Accuracy: ${move.accuracy !== null ? move.accuracy + '%' : '—'}</span>
+                        <span>PP: ${move.pp}</span>
+                    </div>
+                    <button class="btn btn-primary mt-2" onclick="showMoveDetails('${move.name}', '${move.type}', ${move.power !== null ? move.power : 'null'}, ${move.accuracy !== null ? move.accuracy : 'null'}, ${move.pp}, '${move.description}')">Learn more about ${move.name}</button>
+                `;
+                movesList.appendChild(moveCard);
+            });
+        });
+
+        function showMoveDetails(name, type, power, accuracy, pp, description) {
+            const modalTitle = document.getElementById('moveDetailsModalLabel');
+            const modalBody = document.querySelector('#moveDetailsModal .modal-body');
+            modalTitle.textContent = `${name} Details`;
+            modalBody.innerHTML = `
+                <p><strong>Type:</strong> ${type}</p>
+                <p><strong>Power:</strong> ${power !== null ? power : '—'}</p>
+                <p><strong>Accuracy:</strong> ${accuracy !== null ? accuracy + '%' : '—'}</p>
+                <p><strong>PP:</strong> ${pp}</p>
+                <p><strong>Description:</strong> ${description}</p>
+            `;
+            $('#moveDetailsModal').modal('show');
+        }
+    </script>
 </body>
 </html>

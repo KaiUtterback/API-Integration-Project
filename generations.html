@@ -123,8 +123,14 @@
                     return idA - idB;
                 });
                 const pokemonData = await Promise.all(pokemonEntries.map(async entry => {
-                    const pokemonResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${entry.name}`);
-                    return pokemonResponse.ok ? await pokemonResponse.json() : null;
+                    try {
+                        const pokemonResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${entry.name}`);
+                        if (!pokemonResponse.ok) throw new Error(`Failed to fetch data for ${entry.name}`);
+                        return await pokemonResponse.json();
+                    } catch (error) {
+                        console.error('Error fetching Pokémon data:', error);
+                        return null;
+                    }
                 }));
                 renderPokemonList(pokemonData.filter(pokemon => pokemon !== null));
             } catch (error) {
